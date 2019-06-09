@@ -168,7 +168,7 @@
 		"name": "button",
 		"color": "ui"
 	},
-	"menu-bar-tintted": {
+	"menu-bar-tinted": {
 		"name": "menu-bar",
 		"color": "ui"
 	}
@@ -211,8 +211,7 @@
 	},
 	"caption": {
 		"font": "font-caption",
-		"fontColor": "black",
-		"background": "toolbar-tinted"
+		"fontColor": "black"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {
