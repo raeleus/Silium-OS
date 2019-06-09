@@ -62,7 +62,7 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        
+        compile 'com.rafaskoberg.gdx:typing-label:1.0.6:sources' 
     }
 }
 
@@ -72,7 +72,7 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        
+        compile 'com.rafaskoberg.gdx:typing-label:1.0.6'
     }
 }
 

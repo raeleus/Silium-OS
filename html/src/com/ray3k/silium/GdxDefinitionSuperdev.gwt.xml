@@ -4,6 +4,7 @@
 	<inherits name='com.badlogic.gdx.backends.gdx_backends_gwt' />
 
     <inherits name='com.ray3k.silium.GdxDefinition' />
+	<inherits name='com.rafaskoberg.gdx.typinglabel' />
     
     <collapse-all-properties />
     
