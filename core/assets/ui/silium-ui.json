@@ -1,0 +1,264 @@
+{
+"com.badlogic.gdx.graphics.g2d.BitmapFont": {
+	"font": {
+		"file": "font.fnt"
+	},
+	"font-button": {
+		"file": "font-button.fnt"
+	},
+	"font-caption": {
+		"file": "font-caption.fnt"
+	},
+	"font-ip": {
+		"file": "font-ip.fnt"
+	}
+},
+"com.badlogic.gdx.graphics.Color": {
+	"black": {
+		"r": 0,
+		"g": 0,
+		"b": 0,
+		"a": 1
+	},
+	"text-outline": {
+		"r": 1,
+		"g": 1,
+		"b": 1,
+		"a": 0.27
+	},
+	"ui": {
+		"r": 0.3137255,
+		"g": 0.8392157,
+		"b": 1,
+		"a": 1
+	},
+	"white": {
+		"r": 1,
+		"g": 1,
+		"b": 1,
+		"a": 1
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable": {
+	"label-bg-tinted": {
+		"name": "label-bg",
+		"color": "ui"
+	},
+	"toolbar-tinted": {
+		"name": "toolbar",
+		"color": "ui"
+	},
+	"scroll-bar-tinted": {
+		"name": "scroll-bar",
+		"color": "ui"
+	},
+	"cursor-tinted": {
+		"name": "cursor",
+		"color": "ui"
+	},
+	"ui": {
+		"name": "white",
+		"color": "ui"
+	},
+	"button-over-tinted": {
+		"name": "button-over",
+		"color": "ui"
+	},
+	"button-pressed-tinted": {
+		"name": "button-pressed",
+		"color": "ui"
+	},
+	"window-tinted": {
+		"name": "window",
+		"color": "ui"
+	},
+	"table-tinted": {
+		"name": "table",
+		"color": "ui"
+	},
+	"table-with-tab-tinted": {
+		"name": "table-with-tab",
+		"color": "ui"
+	},
+	"tab-pressed-tinted": {
+		"name": "tab-pressed",
+		"color": "ui"
+	},
+	"tab-over-tinted": {
+		"name": "tab-over",
+		"color": "ui"
+	},
+	"tab-tinted": {
+		"name": "tab",
+		"color": "ui"
+	},
+	"line-tinted": {
+		"name": "line",
+		"color": "ui"
+	},
+	"icon-system-tinted": {
+		"name": "icon-system",
+		"color": "ui"
+	},
+	"icon-proxy-small-tinted": {
+		"name": "icon-proxy-small",
+		"color": "ui"
+	},
+	"icon-proxy-tinted": {
+		"name": "icon-proxy",
+		"color": "ui"
+	},
+	"icon-player-tinted": {
+		"name": "icon-player",
+		"color": "ui"
+	},
+	"icon-kreddits-tinted": {
+		"name": "icon-kreddits",
+		"color": "ui"
+	},
+	"icon-firewall-tinted": {
+		"name": "icon-firewall",
+		"color": "ui"
+	},
+	"icon-enemy-tinted": {
+		"name": "icon-enemy",
+		"color": "ui"
+	},
+	"icon-data-points-tinted": {
+		"name": "icon-data-points",
+		"color": "ui"
+	},
+	"button-window-close-pressed-tinted": {
+		"name": "button-window-close-pressed",
+		"color": "ui"
+	},
+	"button-window-close-over-tinted": {
+		"name": "button-window-close-over",
+		"color": "ui"
+	},
+	"button-window-close-tinted": {
+		"name": "button-window-close",
+		"color": "ui"
+	},
+	"button-menu-settings-pressed-tinted": {
+		"name": "button-menu-settings-pressed",
+		"color": "ui"
+	},
+	"button-menu-settings-over-tinted": {
+		"name": "button-menu-settings-over",
+		"color": "ui"
+	},
+	"button-menu-settings-tinted": {
+		"name": "button-menu-settings",
+		"color": "ui"
+	},
+	"button-menu-close-pressed-tinted": {
+		"name": "button-menu-close-pressed",
+		"color": "ui"
+	},
+	"button-menu-close-over-tinted": {
+		"name": "button-menu-close-over",
+		"color": "ui"
+	},
+	"button-menu-close-tinted": {
+		"name": "button-menu-close",
+		"color": "ui"
+	},
+	"button-tinted": {
+		"name": "button",
+		"color": "ui"
+	},
+	"menu-bar-tintted": {
+		"name": "menu-bar",
+		"color": "ui"
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
+	"default": {
+		"up": "button-tinted",
+		"down": "button-pressed-tinted",
+		"over": "button-over-tinted"
+	},
+	"window-close": {
+		"up": "button-window-close-tinted",
+		"down": "button-window-close-pressed-tinted",
+		"over": "button-window-close-over-tinted"
+	},
+	"menu-close": {
+		"up": "button-menu-close-tinted",
+		"down": "button-menu-close-pressed-tinted",
+		"over": "button-menu-close-over-tinted"
+	},
+	"menu-settings": {
+		"up": "button-menu-settings-tinted",
+		"down": "button-menu-settings-pressed-tinted",
+		"over": "button-menu-settings-over-tinted"
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+	"default": {
+		"font": "font",
+		"fontColor": "ui"
+	},
+	"ip": {
+		"font": "font-ip",
+		"fontColor": "ui",
+		"background": "label-bg-tinted"
+	},
+	"button": {
+		"font": "font-button",
+		"fontColor": "ui"
+	},
+	"caption": {
+		"font": "font-caption",
+		"fontColor": "black",
+		"background": "toolbar-tinted"
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {
+	"default": {
+		"hScrollKnob": "scroll-bar-tinted",
+		"vScrollKnob": "scroll-bar-tinted"
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+	"default": {
+		"font": "font-button",
+		"fontColor": "ui",
+		"downFontColor": "black",
+		"up": "button-tinted",
+		"down": "button-pressed-tinted",
+		"over": "button-over-tinted"
+	},
+	"tab": {
+		"font": "font",
+		"fontColor": "white",
+		"downFontColor": "black",
+		"checkedFontColor": "black",
+		"up": "tab-tinted",
+		"down": "tab-pressed-tinted",
+		"over": "tab-over-tinted",
+		"checked": "tab-pressed-tinted"
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {
+	"default": {
+		"font": "font",
+		"fontColor": "ui",
+		"cursor": "ui",
+		"selection": "white"
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.TextTooltip$TextTooltipStyle": {
+	"default": {
+		"label": "ip",
+		"wrapWidth": 100
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
+	"default": {
+		"background": "window-tinted",
+		"titleFont": "font"
+	}
+}
+}
