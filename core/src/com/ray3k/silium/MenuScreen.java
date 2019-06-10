@@ -106,6 +106,12 @@ public class MenuScreen implements Screen {
     
         textButton = new TextButton("Engage", skin);
         buttonTable.add(textButton);
+        textButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                nextScreen();
+            }
+        });
     
         textButton = new TextButton("Parameters", skin);
         buttonTable.add(textButton);
@@ -155,6 +161,27 @@ public class MenuScreen implements Screen {
                 }
             }
         });
+    }
+    
+    public void nextScreen() {
+        if (!transitioning) {
+            if (mode == Mode.WAIT) {
+                transitioning = true;
+                stage.addAction(Actions.sequence(Actions.fadeOut(1f), new Action() {
+                    @Override
+                    public boolean act(float delta) {
+                        logoDrawable.getAnimationState().setAnimation(0,"hide",false);
+                        return true;
+                    }
+                }, Actions.delay(1.5f), new Action() {
+                    @Override
+                    public boolean act(float delta) {
+                        Core.instance.setScreen(new GameScreen());
+                        return true;
+                    }
+                }));
+            }
+        }
     }
     
     @Override
