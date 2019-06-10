@@ -173,6 +173,18 @@
 	"menu-bar-tinted": {
 		"name": "menu-bar",
 		"color": "ui"
+	},
+	"slider-knob-tinted": {
+		"name": "slider-knob",
+		"color": "ui"
+	},
+	"slider-knob-pressed-tinted": {
+		"name": "slider-knob-pressed",
+		"color": "ui"
+	},
+	"slider-tinted": {
+		"name": "slider",
+		"color": "ui"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
@@ -220,6 +232,14 @@
 	"default": {
 		"hScrollKnob": "scroll-bar-tinted",
 		"vScrollKnob": "scroll-bar-tinted"
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.Slider$SliderStyle": {
+	"default-horizontal": {
+		"knobOver": "slider-knob-pressed-tinted",
+		"knobDown": "slider-knob-pressed-tinted",
+		"background": "slider-tinted",
+		"knob": "slider-knob-tinted"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {

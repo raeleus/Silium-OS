@@ -1,5 +1,5 @@
 {
-"skeleton": { "hash": "1YqdrGVuqq6ccZWNZfdtFaCJELs", "spine": "3.7.94", "width": 555, "height": 131, "images": "../output/", "audio": "" },
+"skeleton": { "hash": "AP6CBRRg1iF76xuI9RqKYOy12ac", "spine": "3.7.94", "width": 555, "height": 131, "images": "../output/", "audio": "" },
 "bones": [
 	{ "name": "root", "x": 270, "y": 67 },
 	{ "name": "logo-line", "parent": "root", "length": 266.01, "x": -2, "y": 55.5 },
@@ -35,21 +35,21 @@
 			"logo-line": {
 				"color": [
 					{ "time": 0, "color": "4ed4ff00" },
-					{ "time": 0.3333, "color": "4dd3ffff" },
-					{ "time": 0.7, "color": "4ed4ffff" },
-					{ "time": 1.0333, "color": "4ed4ff00" }
+					{ "time": 0.6333, "color": "4dd3ffff" },
+					{ "time": 0.8333, "color": "4ed4ffff" },
+					{ "time": 2, "color": "4ed4ff00" }
 				]
 			}
 		},
 		"bones": {
 			"logo-line": {
 				"translate": [
-					{ "time": 0.7, "x": 0, "y": 0 },
-					{ "time": 1.0333, "x": 0, "y": -119 }
+					{ "time": 0.8333, "x": 0, "y": 0 },
+					{ "time": 2, "x": 0, "y": -119 }
 				],
 				"scale": [
 					{ "time": 0, "x": 0, "y": 1 },
-					{ "time": 0.3333, "x": 1, "y": 1 }
+					{ "time": 0.6333, "x": 1, "y": 1 }
 				]
 			}
 		},
@@ -64,11 +64,11 @@
 							"curve": "stepped"
 						},
 						{
-							"time": 0.7,
+							"time": 0.8333,
 							"offset": 5,
 							"vertices": [ 119.99999, 0, 115.99993 ]
 						},
-						{ "time": 1.0333 }
+						{ "time": 2 }
 					]
 				}
 			}

@@ -14,6 +14,7 @@ public class Core extends Game {
     public SkeletonRenderer skeletonRenderer;
     public AssetManager assetManager;
     public PlayList playList;
+    public Music currentVoice;
     
     public final static String VERSION = "1.0";
     @Override
@@ -41,6 +42,10 @@ public class Core extends Game {
         assetManager.load("music/03 In The Shadows They Hide.mp3", Music.class);
         assetManager.load("music/04 He Eludes Us.mp3", Music.class);
         assetManager.load("music/05 To Seek Find And Capture.mp3", Music.class);
+    
+        for (int i = 1; i <=25; i++) {
+            assetManager.load("voice/" + Integer.toString(i) + "-Mix.mp3", Music.class);
+        }
         
         assetManager.finishLoading();
     
@@ -60,5 +65,12 @@ public class Core extends Game {
         super.dispose();
         
         assetManager.dispose();
+    }
+    
+    public Music playVoice(int number) {
+        Music music = assetManager.get("voice/" + Integer.toString(number) + "-Mix.mp3");
+        music.play();
+        currentVoice = music;
+        return music;
     }
 }
