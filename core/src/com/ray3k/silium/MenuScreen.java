@@ -49,8 +49,6 @@ public class MenuScreen implements Screen {
         SpineDrawable.SpineDrawableTemplate template = new SpineDrawable.SpineDrawableTemplate();
         SpineDrawable spineDrawable = new SpineDrawable(Core.instance.assetManager.get("ui/logo.json", SkeletonData.class),Core.instance.skeletonRenderer, template);
         spineDrawable.getAnimationState().setAnimation(0, "animation", false);
-//        spineDrawable.getSkeleton().updateWorldTransform();
-//        spineDrawable.getAnimationState().apply(spineDrawable.getSkeleton());
         Image image = new Image(spineDrawable);
         root.add(image);
         spineDrawable.getAnimationState().addListener(new AnimationState.AnimationStateAdapter() {

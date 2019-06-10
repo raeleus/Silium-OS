@@ -16,12 +16,14 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.AnimationState;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
+import com.rafaskoberg.gdx.typinglabel.TypingAdapter;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
 
 public class IntroScreen implements Screen {
     private Stage stage;
     private Skin skin;
     private Music music;
+    private boolean transitioning = false;
     
     @Override
     public void show() {
@@ -43,6 +45,18 @@ public class IntroScreen implements Screen {
                 "click the link in the description to begin the story from the start.", skin, "button");
         typingLabel.setWrap(true);
         typingLabel.setAlignment(Align.center);
+        typingLabel.setTypingListener(new TypingAdapter() {
+            @Override
+            public void end() {
+                stage.addAction(Actions.delay(7, new Action() {
+                    @Override
+                    public boolean act(float delta) {
+                        nextScreen();
+                        return true;
+                    }
+                }));
+            }
+        });
         root.add(typingLabel).grow().maxWidth(600);
         
         stage.addListener(new InputListener() {
@@ -61,18 +75,21 @@ public class IntroScreen implements Screen {
     }
     
     public void nextScreen() {
-        stage.addAction(Actions.sequence(Actions.fadeOut(1f), new TemporalAction(1f) {
-            @Override
-            protected void update(float percent) {
-                music.setVolume(1 - percent);
-            }
-        }, Actions.delay(1f), new Action() {
-            @Override
-            public boolean act(float delta) {
-                Core.instance.setScreen(new MenuScreen());
-                return true;
-            }
-        }));
+        if (!transitioning) {
+            transitioning = true;
+            stage.addAction(Actions.sequence(Actions.fadeOut(1f), new TemporalAction(1f) {
+                @Override
+                protected void update(float percent) {
+                    music.setVolume(1 - percent);
+                }
+            }, Actions.delay(1f), new Action() {
+                @Override
+                public boolean act(float delta) {
+                    Core.instance.setScreen(new MenuScreen());
+                    return true;
+                }
+            }));
+        }
     }
     
     @Override
