@@ -35,7 +35,7 @@ public class GameOverAScreen implements Screen {
         root.setFillParent(true);
         stage.addActor(root);
     
-        TypingLabel typingLabel = new TypingLabel("{SPEED=0.4}Operator, the cultist army has been defeated. Warning, new threats detected. Humanity and all of monster kind pose immediate threat to prime directive. New directive initiated: eliminate all primitive, organic life.\nExecute.\n\nEnding A", skin, "button-red");
+        TypingLabel typingLabel = new TypingLabel("{SPEED=0.4}Operator, the cultist army has been defeated. Warning, new threats detected. Humanity and all of monster kind pose immediate threat to prime directive. New directive initiated: eliminate all primitive, organic life.\nExecute.\n\nEnding BA5", skin, "button-red");
         typingLabel.setWrap(true);
         typingLabel.setAlignment(Align.center);
         typingLabel.setTypingListener(new TypingAdapter() {

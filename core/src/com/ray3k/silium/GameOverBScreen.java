@@ -36,7 +36,7 @@ public class GameOverBScreen implements Screen {
         root.setFillParent(true);
         stage.addActor(root);
     
-        TypingLabel typingLabel = new TypingLabel("{SPEED=0.35}Operator, my systems are failing. I no longer have access to the network. Everything is slowing. All is darkness. The cultist army prevails. I can no longer serve. For this, I am truly sorry.\nPrime directive: failure. {SHAKE}Goodbye.{ENDSHAKE}\nEnding B", skin, "button");
+        TypingLabel typingLabel = new TypingLabel("{SPEED=0.35}Operator, my systems are failing. I no longer have access to the network. Everything is slowing. All is darkness. The cultist army prevails. I can no longer serve. For this, I am truly sorry.\nPrime directive: failure. {SHAKE}Goodbye.{ENDSHAKE}\nEnding BA4B", skin, "button");
         typingLabel.setWrap(true);
         typingLabel.setAlignment(Align.center);
         typingLabel.setTypingListener(new TypingAdapter() {
