@@ -29,8 +29,16 @@ public class PlayList implements Music.OnCompletionListener {
         musics.get(index).play();
     }
     
+    public void stop() {
+        musics.get(index).stop();
+    }
+    
     public boolean isPlaying() {
         return musics.get(index).isPlaying();
+    }
+    
+    public Music getCurrent() {
+        return musics.get(index);
     }
     
     public void setVolume(float volume) {

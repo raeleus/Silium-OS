@@ -5,12 +5,12 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.AnimationState;
@@ -21,8 +21,14 @@ import com.rafaskoberg.gdx.typinglabel.TypingLabel;
 public class MenuScreen implements Screen {
     private Stage stage;
     private Skin skin;
+    private SpineDrawable logoDrawable;
     private SpineDrawable loadingDrawable;
     private Table buttonTable;
+    private enum Mode {
+        BEGIN, LOADING, WAIT
+    }
+    private Mode mode;
+    private boolean transitioning;
     
     @Override
     public void show() {
@@ -41,19 +47,23 @@ public class MenuScreen implements Screen {
                 loadingDrawable.getAnimationState().setAnimation(1, "hide", false);
             }
         });
+        
+        mode = Mode.BEGIN;
+        transitioning = false;
     
         Table root = new Table();
         root.setFillParent(true);
         stage.addActor(root);
     
         SpineDrawable.SpineDrawableTemplate template = new SpineDrawable.SpineDrawableTemplate();
-        SpineDrawable spineDrawable = new SpineDrawable(Core.instance.assetManager.get("ui/logo.json", SkeletonData.class),Core.instance.skeletonRenderer, template);
-        spineDrawable.getAnimationState().setAnimation(0, "animation", false);
-        Image image = new Image(spineDrawable);
+        logoDrawable = new SpineDrawable(Core.instance.assetManager.get("ui/logo.json", SkeletonData.class),Core.instance.skeletonRenderer, template);
+        logoDrawable.getAnimationState().setAnimation(0, "animation", false);
+        Image image = new Image(logoDrawable);
         root.add(image);
-        spineDrawable.getAnimationState().addListener(new AnimationState.AnimationStateAdapter() {
+        logoDrawable.getAnimationState().addListener(new AnimationState.AnimationStateAdapter() {
             @Override
             public void complete(AnimationState.TrackEntry entry) {
+                mode = Mode.LOADING;
                 loadingDrawable.getAnimationState().setAnimation(0, "show", false);
                 loadingDrawable.getAnimationState().addAnimation(0, "animation", true, 0);
             }
@@ -97,6 +107,45 @@ public class MenuScreen implements Screen {
             public void changed(ChangeEvent event, Actor actor) {
                 Core.instance.playVoice(2);
                 DialogParameters.show(skin,stage);
+            }
+        });
+        
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                execute();
+                return super.keyDown(event, keycode);
+            }
+    
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                execute();
+                return super.touchDown(event, x, y, pointer, button);
+            }
+            
+            private void execute() {
+                if (!transitioning) {
+                    if (mode == Mode.BEGIN) {
+                        logoDrawable.getAnimationState().update(10f);
+                    } else if (mode == Mode.LOADING) {
+                        transitioning = true;
+                        stage.addAction(Actions.sequence(new TemporalAction(.5f) {
+                            @Override
+                            protected void update(float percent) {
+                                Core.instance.currentVoice.setVolume(1 - percent);
+                            }
+                        }, new Action() {
+                            @Override
+                            public boolean act(float delta) {
+                                transitioning = false;
+                                mode = Mode.WAIT;
+                                Core.instance.currentVoice.stop();
+                                loadingDrawable.getAnimationState().setAnimation(1, "hide", false);
+                                return true;
+                            }
+                        }));
+                    }
+                }
             }
         });
     }
