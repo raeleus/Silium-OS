@@ -106,8 +106,8 @@ public class SpineDrawable extends BaseDrawable {
 
         skeleton.setPosition(x, y);
         animationState.update(Gdx.graphics.getDeltaTime());
-        skeleton.updateWorldTransform();
         animationState.apply(skeleton);
+        skeleton.updateWorldTransform();
 
         skeletonRenderer.draw(batch, skeleton);
         

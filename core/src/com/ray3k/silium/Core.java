@@ -25,7 +25,7 @@ public class Core extends Game {
         
         addAssets();
         
-        setScreen(new MenuScreen());
+        setScreen(new IntroScreen());
     }
     
     private void addAssets() {
@@ -42,6 +42,7 @@ public class Core extends Game {
         assetManager.load("music/03 In The Shadows They Hide.mp3", Music.class);
         assetManager.load("music/04 He Eludes Us.mp3", Music.class);
         assetManager.load("music/05 To Seek Find And Capture.mp3", Music.class);
+        assetManager.load("music/snd_theme_prophecy.mp3", Music.class);
     
         for (int i = 1; i <=25; i++) {
             assetManager.load("voice/" + Integer.toString(i) + "-Mix.mp3", Music.class);
@@ -57,7 +58,6 @@ public class Core extends Game {
         musics.add(assetManager.get("music/05 To Seek Find And Capture.mp3", Music.class));
         playList = new PlayList(musics);
         playList.setVolume(.1f);
-        playList.play();
     }
     
     @Override

@@ -31,6 +31,10 @@ public class MenuScreen implements Screen {
         
         skin = Core.instance.assetManager.get("ui/silium-ui.json");
         
+        if (!Core.instance.playList.isPlaying()) {
+            Core.instance.playList.play();
+        }
+        
         Core.instance.playVoice(1).setOnCompletionListener(new Music.OnCompletionListener() {
             @Override
             public void onCompletion(Music music) {
@@ -44,7 +48,9 @@ public class MenuScreen implements Screen {
     
         SpineDrawable.SpineDrawableTemplate template = new SpineDrawable.SpineDrawableTemplate();
         SpineDrawable spineDrawable = new SpineDrawable(Core.instance.assetManager.get("ui/logo.json", SkeletonData.class),Core.instance.skeletonRenderer, template);
-        spineDrawable.getAnimationState().addAnimation(0, "animation", false, 0);
+        spineDrawable.getAnimationState().setAnimation(0, "animation", false);
+//        spineDrawable.getSkeleton().updateWorldTransform();
+//        spineDrawable.getAnimationState().apply(spineDrawable.getSkeleton());
         Image image = new Image(spineDrawable);
         root.add(image);
         spineDrawable.getAnimationState().addListener(new AnimationState.AnimationStateAdapter() {
