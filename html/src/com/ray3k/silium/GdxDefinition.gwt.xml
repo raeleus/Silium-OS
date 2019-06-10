@@ -5,6 +5,8 @@
 
 	<inherits name='Core' />
 	<inherits name='com.esotericsoftware.spine' />
+	<inherits name="com.rafaskoberg.gdx.typinglabel.typinglabel" />
+	<inherits name="regexodus"/>
 	<entry-point class='com.ray3k.silium.client.HtmlLauncher' />
 	<set-configuration-property name='xsiframe.failIfScriptTag' value='FALSE'/>
 	<set-configuration-property name="gdx.assetpath" value="../core/assets" />

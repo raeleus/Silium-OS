@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
+import com.rafaskoberg.gdx.typinglabel.TypingLabel;
 
 public class GameScreen implements Screen {
     private Stage stage;
@@ -30,7 +31,7 @@ public class GameScreen implements Screen {
         table.setBackground(skin.getDrawable("menu-bar-tinted"));
         root.add(table).growX().expandY().top();
     
-        Label label = new Label("Silium OS ver. " + Core.VERSION,skin,"caption");
+        TypingLabel label = new TypingLabel("Silium OS ver. " + Core.VERSION,skin,"caption");
         table.add(label).expandX().left().padLeft(6);
         
         root.row();
