@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 import com.rafaskoberg.gdx.typinglabel.TypingAdapter;
@@ -25,11 +26,30 @@ public class GameScreen implements Screen {
         TTY1, TTY2, NOTES
     }
     private Tab tab;
+    private String tty1Path;
+    private Array<String> tty1Messages;
+    private String tty2Path;
+    private Array<String> tty2Messages;
+    private enum TtyMode {
+        DISABLED, NETWORK, SERVER
+    }
+    private TtyMode tty1Mode;
+    private TtyMode tty2Mode;
     private Table root;
     ButtonGroup<TextButton> tabButtonGroup;
     
     @Override
     public void show() {
+        tty1Path = "/> ";
+        tty1Messages = new Array<String>();
+        tty1Messages.add("{FASTER}Type \"help\" and press enter to list available commands.");
+        tty1Mode = TtyMode.NETWORK;
+        
+        tty2Path = "/> ";
+        tty2Messages = new Array<String>();
+        tty2Messages.add("{FASTER}Type \"help\" and press enter to list available commands.");
+        tty2Mode = TtyMode.DISABLED;
+        
         stage = new Stage(new ScreenViewport(), new TwoColorPolygonBatch());
         Gdx.input.setInputProcessor(stage);
         stage.addListener(new InputListener() {
@@ -181,47 +201,112 @@ public class GameScreen implements Screen {
     private void createTTY1() {
         TextButton textButton = root.findActor("tty1-button");
         textButton.setChecked(true);
+    
+        Table table = root.findActor("tty-container");
+        table.clear();
+        table.setTouchable(Touchable.enabled);
+        table.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                TextButton textButton = root.findActor("tty1-button");
+                textButton.setChecked(true);
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
+    
+        Table subTable = new Table();
+        subTable.setName("tty1-message-table");
+        final ScrollPane scrollPane = new ScrollPane(subTable, skin);
+        scrollPane.setName("tty1-message-scroll");
+        table.add(scrollPane).growX();
         
-        if (tab != Tab.TTY1) {
-            tab = Tab.TTY1;
-            
-            Table table = root.findActor("tty-container");
-            table.clear();
-            table.setTouchable(Touchable.enabled);
-            table.addListener(new InputListener() {
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    TextButton textButton = root.findActor("tty1-button");
-                    textButton.setChecked(true);
-                    return super.touchDown(event, x, y, pointer, button);
-                }
-            });
-            
-            TypingLabel typingLabel = new TypingLabel("{FASTER}Type \"help\" and press enter to list available commands.", skin);
+        for (int i = 0; i < tty1Messages.size; i++) {
+            String message = tty1Messages.get(i);
+        
+            TypingLabel typingLabel = new TypingLabel(message, skin);
             typingLabel.setWrap(true);
-            table.add(typingLabel).growX().colspan(2);
-    
-            table.row();
-            final Table subTable = new Table();
-            table.add(subTable).grow();
-            subTable.setColor(1, 1, 1, 0);
-            typingLabel.setTypingListener(new TypingAdapter() {
-                @Override
-                public void end() {
-                    subTable.addAction(Actions.fadeIn(.25f));
-                }
-            });
-            
-            subTable.defaults().padTop(5);
-            Label label = new Label("root/documents> ", skin);
-            subTable.add(label).expandY().top();
-    
-            TextField textField = new TextField("", skin);
-            textField.setName("tty1-field");
-            subTable.add(textField).growX().expandY().top().minWidth(50);
-            
-            stage.setKeyboardFocus(root.findActor("tty1-field"));
+            subTable.add(typingLabel).growX().colspan(2);
+            typingLabel.skipToTheEnd();
+            if (i != tty1Messages.size - 1) {
+                subTable.row();
+            } else if (tab != Tab.TTY1) {
+                typingLabel.setTypingListener(new TypingAdapter() {
+                    @Override
+                    public void end() {
+                        Table subTable = root.findActor("tty1-field-table");
+                        subTable.addAction(Actions.fadeIn(.25f));
+                    }
+                });
+            }
         }
+    
+        table.row();
+        subTable = new Table();
+        subTable.setName("tty1-field-table");
+        table.add(subTable).grow();
+        if (tab != Tab.TTY1) subTable.setColor(1, 1, 1, 0);
+    
+        subTable.defaults().padTop(5);
+        Label label = new Label(tty1Path, skin);
+        subTable.add(label).expandY().top();
+    
+        final TextField textField = new TextField("", skin);
+        textField.setName("tty1-field");
+        subTable.add(textField).growX().expandY().top().minWidth(50);
+        textField.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.ENTER) {
+                    String command = textField.getText();
+                    command = interpretCommand(tty1Mode, command);
+                    tty1Messages.add(command);
+    
+                    Table subTable = root.findActor("tty1-message-table");
+                    for (Actor actor : subTable.getChildren()) {
+                        ((TypingLabel) actor).skipToTheEnd();
+                    }
+                    
+                    subTable.row();
+                    TypingLabel typingLabel = new TypingLabel(command, skin);
+                    typingLabel.setWrap(true);
+                    subTable.add(typingLabel).growX();
+    
+                    scrollPane.layout();
+                    scrollPane.layout();
+                    scrollPane.setScrollPercentY(1);
+                    
+                    textField.setText("");
+                }
+                return super.keyDown(event, keycode);
+            }
+        });
+    
+        stage.setKeyboardFocus(root.findActor("tty1-field"));
+        stage.setScrollFocus(root.findActor("tty1-message-scroll"));
+        tab = Tab.TTY1;
+    }
+    
+    private String interpretCommand(TtyMode ttyMode,  String text) {
+        String returnValue = "";
+        
+        if (ttyMode == TtyMode.NETWORK) {
+            if (text.equalsIgnoreCase("help")) {
+                returnValue += "{FASTER}Welcome to Silium OS Command\n";
+                returnValue += "The following commands can be entered while logged into the NETWORK:\n";
+                returnValue += "help {COLOR=#FFFFFFAA}This command list{CLEARCOLOR}\n";
+                returnValue += "clear {COLOR=#FFFFFFAA}Clears all text from the TTY{CLEARCOLOR}\n";
+                returnValue += "brt <ip address> {COLOR=#FFFFFFAA}Initiate a brute force password hack on the specified IP address{CLEARCOLOR}\n";
+                returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
+                returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}";
+            } else {
+                returnValue += "{FASTER}Unknown command: \"" + text + "\"\nType \"help\" and press enter to list available commands.";
+            }
+        } else if (ttyMode == TtyMode.SERVER) {
+        
+        } else {
+        }
+        
+        return returnValue;
     }
     
     private void createTTY2() {
@@ -248,6 +333,7 @@ public class GameScreen implements Screen {
             table.add(typingLabel).growX().colspan(2).expandY().top();
             
             stage.setKeyboardFocus(null);
+            stage.setScrollFocus(null);
         }
     }
     
@@ -256,6 +342,7 @@ public class GameScreen implements Screen {
         textButton.setChecked(true);
         
         stage.setKeyboardFocus(root.findActor("notes-area"));
+        stage.setScrollFocus(null);
     }
     
     private void animationBegin() {
@@ -302,7 +389,7 @@ public class GameScreen implements Screen {
         }, Actions.delay(2), new Action() {
             @Override
             public boolean act(float delta) {
-                createTTY1();
+                if (tab != Tab.TTY1) createTTY1();
                 return true;
             }
         }));
