@@ -29,7 +29,7 @@ public class GameScreen implements Screen {
         
         skin = Core.instance.assetManager.get("ui/silium-ui.json");
     
-        Table root = new Table();
+        final Table root = new Table();
         root.setFillParent(true);
         stage.addActor(root);
         
@@ -56,13 +56,17 @@ public class GameScreen implements Screen {
         Table subTable = new Table();
         table.add(subTable);
         
-        Image image = new Image(skin,"icon-kreddits-tinted");
+        Image image = new Image(skin,"icon-kreddits");
+        image.setName("icon-kreddits");
+        image.setColor(skin.getColor("ui"));
         subTable.add(image);
         
         Label label = new Label("$300",skin);
         subTable.add(label);
     
-        image = new Image(skin,"icon-data-points-tinted");
+        image = new Image(skin,"icon-data-points");
+        image.setName("icon-data-points");
+        image.setColor(skin.getColor("ui"));
         subTable.add(image).spaceLeft(10);
     
         label = new Label("X5",skin);
@@ -130,12 +134,41 @@ public class GameScreen implements Screen {
         mode = Mode.BEGIN;
         transitioning = true;
         stage.getRoot().setColor(1,1,1,0);
-        stage.addAction(Actions.sequence(Actions.fadeIn(1), new Action() {
+        stage.addAction(Actions.sequence(Actions.fadeIn(.5f), new Action() {
             @Override
             public boolean act(float delta) {
                 transitioning = false;
                 mode = Mode.TARGETS_OF_INTEREST;
                 Core.instance.playVoice(3);
+                return true;
+            }
+        }, Actions.delay(6), new Action() {
+            @Override
+            public boolean act(float delta) {
+                Core.instance.playVoice(4);
+                Image image = root.findActor("icon-data-points");
+                image.addAction(Actions.color(skin.getColor("red"), .25f));
+                return true;
+            }
+        }, Actions.delay(3), new Action() {
+            @Override
+            public boolean act(float delta) {
+                Image image = root.findActor("icon-data-points");
+                image.addAction(Actions.color(skin.getColor("ui"), .25f));
+                return true;
+            }
+        }, new Action() {
+            @Override
+            public boolean act(float delta) {
+                Image image = root.findActor("icon-kreddits");
+                image.addAction(Actions.color(skin.getColor("red"), .5f));
+                return true;
+            }
+        }, Actions.delay(4), new Action() {
+            @Override
+            public boolean act(float delta) {
+                Image image = root.findActor("icon-kreddits");
+                image.addAction(Actions.color(skin.getColor("ui"), .5f));
                 return true;
             }
         }));
