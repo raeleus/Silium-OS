@@ -216,6 +216,7 @@ public class GameScreen implements Screen {
     
         Table subTable = new Table();
         subTable.setName("tty1-message-table");
+        subTable.pad(3);
         final ScrollPane scrollPane = new ScrollPane(subTable, skin);
         scrollPane.setName("tty1-message-scroll");
         table.add(scrollPane).growX();
@@ -252,6 +253,17 @@ public class GameScreen implements Screen {
     
         final TextField textField = new TextField("", skin);
         textField.setName("tty1-field");
+        textField.setFocusTraversal(false);
+        textField.setTextFieldFilter(new TextField.TextFieldFilter() {
+            @Override
+            public boolean acceptChar(TextField textField, char c) {
+                if (c == '\t') {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        });
         subTable.add(textField).growX().expandY().top().minWidth(50);
         textField.addListener(new InputListener() {
             @Override
@@ -276,6 +288,9 @@ public class GameScreen implements Screen {
                     scrollPane.setScrollPercentY(1);
                     
                     textField.setText("");
+                } else if (keycode == Input.Keys.TAB) {
+                    textField.setText(autoComplete(tty1Mode, textField.getText()));
+                    textField.setCursorPosition(textField.getText().length());
                 }
                 return super.keyDown(event, keycode);
             }
@@ -304,6 +319,33 @@ public class GameScreen implements Screen {
         } else if (ttyMode == TtyMode.SERVER) {
         
         } else {
+        }
+        
+        return returnValue;
+    }
+    
+    private String autoComplete(TtyMode ttyMode, String text) {
+        String returnValue = text;
+        
+        if (!text.equals("")) {
+            Array<String> commands = new Array<String>();
+            if (ttyMode == TtyMode.NETWORK) {
+                commands.add("help");
+                commands.add("clear");
+                commands.add("brt");
+                commands.add("vul");
+                commands.add("ssh");
+            } else if (ttyMode == TtyMode.SERVER) {
+    
+            } else {
+            }
+    
+            for (String command : commands) {
+                if (command.toLowerCase().startsWith(text)) {
+                    returnValue = command;
+                    break;
+                }
+            }
         }
         
         return returnValue;
