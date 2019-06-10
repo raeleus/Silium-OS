@@ -37,6 +37,12 @@
 		"g": 1,
 		"b": 1,
 		"a": 1
+	},
+	"window-bg": {
+		"r": 0,
+		"g": 0,
+		"b": 0,
+		"a": 0.45666668
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.Skin$TintedDrawable": {
@@ -185,6 +191,10 @@
 	"slider-tinted": {
 		"name": "slider",
 		"color": "ui"
+	},
+	"window-bg": {
+		"name": "white",
+		"color": "window-bg"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
@@ -240,6 +250,9 @@
 		"knobDown": "slider-knob-pressed-tinted",
 		"background": "slider-tinted",
 		"knob": "slider-knob-tinted"
+	},
+	"default-vertical": {
+		"background": "slider-tinted"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
@@ -279,7 +292,8 @@
 "com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle": {
 	"default": {
 		"background": "window-tinted",
-		"titleFont": "font"
+		"titleFont": "font",
+		"stageBackground": "window-bg"
 	}
 }
 }

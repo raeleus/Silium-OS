@@ -92,6 +92,7 @@ public class MenuScreen implements Screen {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 Core.instance.playVoice(2);
+                DialogParameters.show(skin,stage);
             }
         });
     }
