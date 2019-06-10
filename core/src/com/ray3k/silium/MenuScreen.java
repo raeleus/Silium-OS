@@ -45,6 +45,7 @@ public class MenuScreen implements Screen {
             @Override
             public void onCompletion(Music music) {
                 loadingDrawable.getAnimationState().setAnimation(1, "hide", false);
+                mode = Mode.WAIT;
             }
         });
         
