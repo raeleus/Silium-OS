@@ -32,5 +32,12 @@
               }
               document.getElementById('embed-html').addEventListener('mousedown', handleMouseDown, false);
               document.getElementById('embed-html').addEventListener('mouseup', handleMouseUp, false);
+
+              window.addEventListener("keydown", function(e) {
+                     // prevent keys from triggering browser commands
+                     if([112, 113, 114].indexOf(e.keyCode) > -1) {
+                            e.preventDefault();
+                     }
+              }, false);
        </script>
 </html>

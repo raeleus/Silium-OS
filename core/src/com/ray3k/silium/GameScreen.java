@@ -4,32 +4,54 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
+import com.rafaskoberg.gdx.typinglabel.TypingAdapter;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
 
 public class GameScreen implements Screen {
     private Stage stage;
     private Skin skin;
-    private final static String LONG_TEXT = "This is a very long text that I'm trying to use to develop my abilities in the naked arts. It is known throughout the land as an evil assassin supersoldier.";
     private enum Mode {
         BEGIN, TARGETS_OF_INTEREST
     }
     private Mode mode;
     private boolean transitioning;
+    private enum Tab {
+        TTY1, TTY2, NOTES
+    }
+    private Tab tab;
+    private Table root;
+    ButtonGroup<TextButton> tabButtonGroup;
     
     @Override
     public void show() {
         stage = new Stage(new ScreenViewport(), new TwoColorPolygonBatch());
         Gdx.input.setInputProcessor(stage);
+        stage.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.F1) {
+                    createTTY1();
+                    return true;
+                } else if (keycode == Input.Keys.F2) {
+                    createTTY2();
+                    return true;
+                } else if (keycode == Input.Keys.F3) {
+                    createNotes();
+                    return true;
+                }
+                return super.keyDown(event, keycode);
+            }
+        });
         
         skin = Core.instance.assetManager.get("ui/silium-ui.json");
     
-        final Table root = new Table();
+        root = new Table();
         root.setFillParent(true);
         stage.addActor(root);
         
@@ -91,46 +113,152 @@ public class GameScreen implements Screen {
         table.setBackground(skin.getDrawable("table-with-tab-tinted"));
         bottom.add(table).grow();
     
-        ButtonGroup<TextButton> buttonGroup = new ButtonGroup<TextButton>();
+        tabButtonGroup = new ButtonGroup<TextButton>();
         
         TextButton textButton = new TextButton("TTY1", skin, "tab");
+        textButton.setName("tty1-button");
+        textButton.setProgrammaticChangeEvents(false);
         table.add(textButton);
-        buttonGroup.add(textButton);
+        tabButtonGroup.add(textButton);
+        textButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                createTTY1();
+            }
+        });
     
         textButton = new TextButton("TTY2", skin, "tab");
+        textButton.setName("tty2-button");
+        textButton.setProgrammaticChangeEvents(false);
         table.add(textButton);
-        buttonGroup.add(textButton);
+        tabButtonGroup.add(textButton);
+        textButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                createTTY2();
+            }
+        });
         
         table.add().expandX();
         
         table.row();
         subTable = new Table();
+        subTable.setName("tty-container");
         table.add(subTable).grow().padTop(8).colspan(3);
-        
-        typingLabel = new TypingLabel(LONG_TEXT, skin);
-        typingLabel.setWrap(true);
-        subTable.add(typingLabel).growX().colspan(2);
-        
-        subTable.defaults().padTop(5);
-        subTable.row();
-        label = new Label("root/documents>", skin);
-        subTable.add(label).expandY().top();
-        
-        TextField textField = new TextField("", skin);
-        subTable.add(textField).growX().expandY().top().minWidth(50);
         
         table = new Table();
         table.setBackground(skin.getDrawable("table-with-tab-tinted"));
         bottom.add(table).fillX().growY().maxWidth(200);
         
         textButton = new TextButton("Notes", skin, "tab");
+        textButton.setName("notes-button");
+        textButton.setProgrammaticChangeEvents(false);
         table.add(textButton).left();
-        buttonGroup.add(textButton);
+        tabButtonGroup.add(textButton);
+        textButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                createNotes();
+            }
+        });
     
         table.row();
         TextArea textArea = new TextArea("",skin);
+        textArea.setName("notes-area");
         table.add(textArea).grow().padTop(8).minWidth(50);
+        textArea.addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                TextButton textButton = root.findActor("notes-button");
+                textButton.setChecked(true);
+                return super.touchDown(event, x, y, pointer, button);
+            }
+        });
+        
+        animationBegin();
+    }
     
+    private void createTTY1() {
+        TextButton textButton = root.findActor("tty1-button");
+        textButton.setChecked(true);
+        
+        if (tab != Tab.TTY1) {
+            tab = Tab.TTY1;
+            
+            Table table = root.findActor("tty-container");
+            table.clear();
+            table.setTouchable(Touchable.enabled);
+            table.addListener(new InputListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    TextButton textButton = root.findActor("tty1-button");
+                    textButton.setChecked(true);
+                    return super.touchDown(event, x, y, pointer, button);
+                }
+            });
+            
+            TypingLabel typingLabel = new TypingLabel("{FASTER}Type \"help\" and press enter to list available commands.", skin);
+            typingLabel.setWrap(true);
+            table.add(typingLabel).growX().colspan(2);
+    
+            table.row();
+            final Table subTable = new Table();
+            table.add(subTable).grow();
+            subTable.setColor(1, 1, 1, 0);
+            typingLabel.setTypingListener(new TypingAdapter() {
+                @Override
+                public void end() {
+                    subTable.addAction(Actions.fadeIn(.25f));
+                }
+            });
+            
+            subTable.defaults().padTop(5);
+            Label label = new Label("root/documents> ", skin);
+            subTable.add(label).expandY().top();
+    
+            TextField textField = new TextField("", skin);
+            textField.setName("tty1-field");
+            subTable.add(textField).growX().expandY().top().minWidth(50);
+            
+            stage.setKeyboardFocus(root.findActor("tty1-field"));
+        }
+    }
+    
+    private void createTTY2() {
+        TextButton textButton = root.findActor("tty2-button");
+        textButton.setChecked(true);
+        
+        if (tab != Tab.TTY2) {
+            tab =  Tab.TTY2;
+    
+            Table table = root.findActor("tty-container");
+            table.clear();
+            table.setTouchable(Touchable.enabled);
+            table.addListener(new InputListener() {
+                @Override
+                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                    TextButton textButton = root.findActor("tty2-button");
+                    textButton.setChecked(true);
+                    return super.touchDown(event, x, y, pointer, button);
+                }
+            });
+    
+            TypingLabel typingLabel = new TypingLabel("{FASTER}TTY2 is not available. Upgrade your systems to add this capability.", skin);
+            typingLabel.setWrap(true);
+            table.add(typingLabel).growX().colspan(2).expandY().top();
+            
+            stage.setKeyboardFocus(null);
+        }
+    }
+    
+    private void createNotes() {
+        TextButton textButton = root.findActor("notes-button");
+        textButton.setChecked(true);
+        
+        stage.setKeyboardFocus(root.findActor("notes-area"));
+    }
+    
+    private void animationBegin() {
         mode = Mode.BEGIN;
         transitioning = true;
         stage.getRoot().setColor(1,1,1,0);
@@ -169,6 +297,12 @@ public class GameScreen implements Screen {
             public boolean act(float delta) {
                 Image image = root.findActor("icon-kreddits");
                 image.addAction(Actions.color(skin.getColor("ui"), .5f));
+                return true;
+            }
+        }, Actions.delay(2), new Action() {
+            @Override
+            public boolean act(float delta) {
+                createTTY1();
                 return true;
             }
         }));
