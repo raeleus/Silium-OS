@@ -74,11 +74,13 @@
 	},
 	"table-tinted": {
 		"name": "table",
-		"color": "ui"
+		"color": "ui",
+		"minWidth": 50
 	},
 	"table-with-tab-tinted": {
 		"name": "table-with-tab",
-		"color": "ui"
+		"color": "ui",
+		"minWidth": 50
 	},
 	"tab-pressed-tinted": {
 		"name": "tab-pressed",
@@ -230,8 +232,8 @@
 		"over": "button-over-tinted"
 	},
 	"tab": {
-		"font": "font",
-		"fontColor": "white",
+		"font": "font-ip",
+		"fontColor": "ui",
 		"downFontColor": "black",
 		"checkedFontColor": "black",
 		"up": "tab-tinted",
