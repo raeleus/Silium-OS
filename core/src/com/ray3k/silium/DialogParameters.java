@@ -22,6 +22,8 @@ public class DialogParameters extends Dialog {
         });
         
         Table root = getContentTable();
+        getCell(getContentTable()).minSize(300, 100);
+        
         Label label = new Label("SFX", skin);
         root.add(label).padLeft(8);
         
