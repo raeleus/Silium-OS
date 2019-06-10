@@ -20,6 +20,12 @@
 		"b": 0,
 		"a": 1
 	},
+	"red": {
+		"r": 1,
+		"g": 0,
+		"b": 0,
+		"a": 1
+	},
 	"text-outline": {
 		"r": 1,
 		"g": 1,
@@ -236,6 +242,10 @@
 	"caption": {
 		"font": "font-caption",
 		"fontColor": "black"
+	},
+	"button-red": {
+		"font": "font-button",
+		"fontColor": "red"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {
