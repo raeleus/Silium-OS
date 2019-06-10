@@ -1,14 +1,5 @@
 {
-"skeleton": {
-	"hash": "D8s3YRC6NzlKCaKtoT6eHixNpYk",
-	"spine": "3.8.16-beta",
-	"x": -276.94,
-	"y": 54.26,
-	"width": 555,
-	"height": 20,
-	"images": "../output/",
-	"audio": ""
-},
+"skeleton": { "hash": "XYjCZvaz66oXxPo8pUNhIMvX7qk", "spine": "3.7.94", "width": 0, "height": 0, "images": "E:/workspace/Silium OS/design/ui/output", "audio": "" },
 "bones": [
 	{ "name": "root" },
 	{ "name": "line", "parent": "root", "length": 130.8, "x": -2.22, "y": 64.57 }
@@ -18,10 +9,8 @@
 	{ "name": "logo", "bone": "root", "color": "4fd5ffff", "attachment": "logo" },
 	{ "name": "line", "bone": "line", "color": "4dd3ffff", "attachment": "logo-line" }
 ],
-"skins": [
-	{
-		"name": "default",
-		"attachments": {
+"skins": {
+	"default": {
 			"clip": {
 				"clip": {
 					"type": "clipping",
@@ -38,8 +27,7 @@
 				"logo": { "width": 530, "height": 130 }
 			}
 		}
-	}
-],
+},
 "animations": {
 	"animation": {
 		"slots": {
@@ -79,5 +67,4 @@
 			}
 		}
 	}
-}
 }

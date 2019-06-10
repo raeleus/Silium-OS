@@ -5,10 +5,13 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.esotericsoftware.spine.SkeletonData;
+import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 
 public class GameScreen implements Screen {
     private Stage stage;
@@ -16,8 +19,8 @@ public class GameScreen implements Screen {
     
     @Override
     public void show() {
-        stage = new Stage(new ScreenViewport());
-        skin = new Skin(Gdx.files.internal("ui/silium-ui.json"));
+        stage = new Stage(new ScreenViewport(), new TwoColorPolygonBatch());
+        skin = Core.instance.assetManager.get("ui/silium-ui.json");
     
         Table root = new Table();
         root.setFillParent(true);
@@ -29,6 +32,14 @@ public class GameScreen implements Screen {
     
         Label label = new Label("Silium OS ver. " + Core.VERSION,skin,"caption");
         table.add(label).expandX().left().padLeft(6);
+        
+        root.row();
+        SpineDrawable.SpineDrawableTemplate template = new SpineDrawable.SpineDrawableTemplate();
+        SpineDrawable spineDrawable = new SpineDrawable(Core.instance.assetManager.get("ui/logo.json", SkeletonData.class),Core.instance.skeletonRenderer, template);
+//        spineDrawable.getAnimationState().setAnimation(0, "show", false);
+        spineDrawable.getAnimationState().addAnimation(0, "animation", false, 0);
+        Image image = new Image(spineDrawable);
+        root.add(image);
     }
     
     @Override

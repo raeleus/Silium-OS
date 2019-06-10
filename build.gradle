@@ -62,7 +62,7 @@ project(":html") {
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion"
         compile "com.badlogicgames.gdx:gdx:$gdxVersion:sources"
         compile "com.badlogicgames.gdx:gdx-backend-gwt:$gdxVersion:sources"
-        
+        compile 'com.esotericsoftware.spine:spine-libgdx:3.7.83.1:sources'
     }
 }
 
@@ -72,7 +72,7 @@ project(":core") {
 
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
-        
+        compile 'com.esotericsoftware.spine:spine-libgdx:3.7.83.1'
     }
 }
 

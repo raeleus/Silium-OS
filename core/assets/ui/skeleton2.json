@@ -1,0 +1,30 @@
+{
+"skeleton": { "hash": "+LRXhaDlsCmZe1VEMXrQHNr8x0Q", "spine": "3.7.94", "width": 0, "height": 0, "images": "E:/workspace/Silium OS/design/ui/output", "audio": "" },
+"bones": [
+	{ "name": "root" },
+	{ "name": "bone", "parent": "root" }
+],
+"slots": [
+	{ "name": "root", "bone": "root", "attachment": "root" },
+	{ "name": "logo", "bone": "bone", "attachment": "logo" }
+],
+"skins": {
+	"default": {
+		"logo": {
+			"logo": { "width": 530, "height": 130 }
+		},
+		"root": {
+			"root": {
+				"type": "clipping",
+				"end": "root",
+				"vertexCount": 4,
+				"vertices": [ -266, 86.5, 363, 79.5, 288, -119.5, -286, -37.5 ],
+				"color": "ce3a3aff"
+			}
+		}
+	}
+},
+"animations": {
+	"animation": {}
+}
+}
