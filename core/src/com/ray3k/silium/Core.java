@@ -24,7 +24,7 @@ public class Core extends Game {
         
         addAssets();
         
-        setScreen(new GameScreen());
+        setScreen(new MenuScreen());
     }
     
     private void addAssets() {

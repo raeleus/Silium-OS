@@ -1,7 +1,7 @@
 {
-"skeleton": { "hash": "kxRB6MEKzn/m0SG7WT6IGGNRH9I", "spine": "3.7.94", "width": 555, "height": 131, "images": "../output/", "audio": "" },
+"skeleton": { "hash": "1YqdrGVuqq6ccZWNZfdtFaCJELs", "spine": "3.7.94", "width": 555, "height": 131, "images": "../output/", "audio": "" },
 "bones": [
-	{ "name": "root", "x": 274, "y": 35 },
+	{ "name": "root", "x": 270, "y": 67 },
 	{ "name": "logo-line", "parent": "root", "length": 266.01, "x": -2, "y": 55.5 },
 	{ "name": "logo", "parent": "root", "length": 256.05 }
 ],
@@ -71,6 +71,21 @@
 						{ "time": 1.0333 }
 					]
 				}
+			}
+		}
+	},
+	"hide": {
+		"slots": {
+			"logo": {
+				"color": [
+					{ "time": 0, "color": "4fd5ffff" },
+					{ "time": 0.6667, "color": "4ed4ff00" }
+				]
+			},
+			"logo-line": {
+				"attachment": [
+					{ "time": 0, "name": null }
+				]
 			}
 		}
 	}
