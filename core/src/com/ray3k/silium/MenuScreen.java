@@ -97,6 +97,12 @@ public class MenuScreen implements Screen {
         buttonTable.defaults().uniform().fill();
         TextButton textButton = new TextButton("Mission Details", skin);
         buttonTable.add(textButton);
+        textButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                DialogMission.show(skin, stage);
+            }
+        });
     
         textButton = new TextButton("Engage", skin);
         buttonTable.add(textButton);
