@@ -4,7 +4,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
@@ -14,6 +16,11 @@ public class GameScreen implements Screen {
     private Stage stage;
     private Skin skin;
     private final static String LONG_TEXT = "This is a very long text that I'm trying to use to develop my abilities in the naked arts. It is known throughout the land as an evil assassin supersoldier.";
+    private enum Mode {
+        BEGIN, TARGETS_OF_INTEREST
+    }
+    private Mode mode;
+    private boolean transitioning;
     
     @Override
     public void show() {
@@ -119,6 +126,19 @@ public class GameScreen implements Screen {
         table.row();
         TextArea textArea = new TextArea("",skin);
         table.add(textArea).grow().padTop(8).minWidth(50);
+    
+        mode = Mode.BEGIN;
+        transitioning = true;
+        stage.getRoot().setColor(1,1,1,0);
+        stage.addAction(Actions.sequence(Actions.fadeIn(1), new Action() {
+            @Override
+            public boolean act(float delta) {
+                transitioning = false;
+                mode = Mode.TARGETS_OF_INTEREST;
+                Core.instance.playVoice(3);
+                return true;
+            }
+        }));
     }
     
     @Override
