@@ -208,6 +208,18 @@ public class GameScreen implements Screen {
                 textButton.setChecked(true);
                 return super.touchDown(event, x, y, pointer, button);
             }
+    
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.SPACE && Gdx.app.getType() == Application.ApplicationType.WebGL) {
+                    TextArea textArea = root.findActor("notes-area");
+                    int position = textArea.getCursorPosition();
+                    textArea.setText(textArea.getText().substring(0,position) + " " + textArea.getText().substring(position));
+                    textArea.setCursorPosition(position + 1);
+                    return true;
+                }
+                return super.keyDown(event, keycode);
+            }
         });
         
         animationBegin();
@@ -374,10 +386,22 @@ public class GameScreen implements Screen {
                     }
                 }
             } else if (text.startsWith("vul")) {
-        
+                String[] split = text.split("\\s");
+                if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+                    returnValue = "{FASTER}Incorrect paramaters for vul command. Type \"help\" and press enter to list available commands.";
+                } else {
+                    if (tab == Tab.TTY1) {
+                        tty1Mode = TtyMode.BRUTE_FORCE;
+                        animateVulnerability();
+                    }
+                }
             } else if (text.startsWith("ssh")) {
         
-            } else {
+            } else if (text.equalsIgnoreCase("swordfish")) {
+                returnValue = "{FASTER}CLAUS: Ahh fooey! The connection dropped!\nSYSADMIN: WTH? Why am I still getting your messages?\nCLAUS: I'm transmitting through an intermediary right now, but the connection is {SHAKE}shakey!{ENDSHAKE}\nSYSADMIN: Alright, sign off and sign back on. It should be fixed now.\n{SLOW}{WAVE}USER HAS DISCONNECTED";
+            }
+            
+            else {
                 returnValue += "{FASTER}Unknown command: \"" + text + "\"\nType \"help\" and press enter to list available commands.";
             }
         } else if (ttyMode == TtyMode.SERVER) {
@@ -449,7 +473,7 @@ public class GameScreen implements Screen {
             sequenceAction.addAction(new Action() {
                 @Override
                 public boolean act(float delta) {
-                    String message = "{FASTER}Successfully Hacked.\nUsername is " + user + "\nPassword is " + password;
+                    String message = "{FASTER}\nSuccessfully Hacked.\nUsername is " + user + "\nPassword is " + password;
                     tty1Messages.add(message);
                     Table subTable = root.findActor("tty1-message-table");
                     subTable.row();
@@ -457,6 +481,60 @@ public class GameScreen implements Screen {
                     typingLabel.setWrap(true);
                     subTable.add(typingLabel).growX();
                 
+                    ScrollPane scrollPane = root.findActor("tty1-message-scroll");
+                    scrollPane.layout();
+                    scrollPane.layout();
+                    scrollPane.setScrollPercentY(1);
+                    return true;
+                }
+            });
+        }
+        
+        stage.addAction(sequenceAction);
+    }
+    
+    private void animateVulnerability() {
+        SequenceAction sequenceAction = new SequenceAction();
+        
+        for (int i = 0; i < 200; i++) {
+            if (tab == Tab.TTY1) {
+                sequenceAction.addAction(new Action() {
+                    @Override
+                    public boolean act(float delta) {
+                        String vulnerability = "{FASTER}" + Core.instance.vulnerabilities.random();
+                        tty1Messages.add(vulnerability);
+                        Table subTable = root.findActor("tty1-message-table");
+                        subTable.row();
+                        TypingLabel typingLabel = new TypingLabel(vulnerability, skin);
+                        typingLabel.setWrap(true);
+                        subTable.add(typingLabel).growX();
+                        
+                        ScrollPane scrollPane = root.findActor("tty1-message-scroll");
+                        scrollPane.layout();
+                        scrollPane.layout();
+                        scrollPane.setScrollPercentY(1);
+                        return true;
+                    }
+                });
+                sequenceAction.addAction(Actions.delay(.1f));
+            }
+        }
+        
+        final String user = Core.instance.users.random();
+        final String password = Core.instance.passwords.random();
+        
+        if (tab == Tab.TTY1) {
+            sequenceAction.addAction(new Action() {
+                @Override
+                public boolean act(float delta) {
+                    String message = "{FASTER}\nSuccessfully Hacked.\nUsername is " + user + "\nPassword is " + password;
+                    tty1Messages.add(message);
+                    Table subTable = root.findActor("tty1-message-table");
+                    subTable.row();
+                    TypingLabel typingLabel = new TypingLabel(message, skin);
+                    typingLabel.setWrap(true);
+                    subTable.add(typingLabel).growX();
+                    
                     ScrollPane scrollPane = root.findActor("tty1-message-scroll");
                     scrollPane.layout();
                     scrollPane.layout();
