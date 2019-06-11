@@ -4,14 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.scenes.scene2d.Action;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
@@ -31,38 +30,73 @@ public class GameOverAScreen implements Screen {
         skin = Core.instance.assetManager.get("ui/silium-ui.json");
         Core.instance.playVoice(24);
     
-        Table root = new Table();
+        final Table root = new Table();
         root.setFillParent(true);
         stage.addActor(root);
     
-        TypingLabel typingLabel = new TypingLabel("{SPEED=0.4}Operator, the cultist army has been defeated. Warning, new threats detected. Humanity and all of monster kind pose immediate threat to prime directive. New directive initiated: eliminate all primitive, organic life.\nExecute.\n\nEnding BA5", skin, "button-red");
+        final TypingLabel typingLabel = new TypingLabel("{SPEED=0.4}Operator, the cultist army has been defeated. Warning, new threats detected. Humanity and all of monster kind pose immediate threat to prime directive. New directive initiated: eliminate all primitive, organic life.\nExecute.\n\nEnding BA5", skin, "button-red");
+        typingLabel.setName("typing-label");
         typingLabel.setWrap(true);
         typingLabel.setAlignment(Align.center);
         typingLabel.setTypingListener(new TypingAdapter() {
             @Override
             public void end() {
-                stage.addAction(Actions.delay(7, new Action() {
-                    @Override
-                    public boolean act(float delta) {
-                        nextScreen();
-                        return true;
-                    }
-                }));
+                Table table = root.findActor("table");
+                table.addAction(Actions.sequence(Actions.fadeIn(1),Actions.touchable(Touchable.enabled)));
             }
         });
         root.add(typingLabel).grow().maxWidth(600);
         
+        root.row();
+        Table table = new Table();
+        table.setName("table");
+        table.setColor(1,1,1,0);
+        table.setTouchable(Touchable.disabled);
+        root.add(table).growX();
+    
+        table.defaults().space(50).uniform().fill();
+        TextButton textButton = new TextButton("Open Next Game", skin, "red");
+        table.add(textButton);
+        textButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.net.openURI("https://itch.io/c/530069/branching-corpses");
+            }
+        });
+    
+        textButton = new TextButton("Play Again", skin, "red");
+        table.add(textButton);
+        textButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                nextScreen();
+            }
+        });
+        
         stage.addListener(new InputListener() {
             @Override
-            public boolean keyDown(InputEvent event, int keycode) {
-                nextScreen();
-                return super.keyDown(event, keycode);
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                execute();
+                return super.touchDown(event, x, y, pointer, button);
             }
     
             @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                nextScreen();
-                return super.touchDown(event, x, y, pointer, button);
+            public boolean keyDown(InputEvent event, int keycode) {
+                execute();
+                return super.keyDown(event, keycode);
+            }
+            
+            private void execute() {
+                TypingLabel typingLabel1 = root.findActor("typing-label");
+                typingLabel.skipToTheEnd();
+                
+                stage.addAction(new TemporalAction(1f) {
+                    float currentVolume = Core.instance.currentVoice.getVolume();
+                    @Override
+                    protected void update(float percent) {
+                        Core.instance.currentVoice.setVolume((1 - percent) * currentVolume);
+                    }
+                });
             }
         });
     }
@@ -73,7 +107,7 @@ public class GameOverAScreen implements Screen {
             stage.addAction(Actions.sequence(Actions.fadeOut(1f), new TemporalAction(1f) {
                 @Override
                 protected void update(float percent) {
-                    Core.instance.currentVoice.setVolume(1 - percent);
+                    Core.instance.currentVoice.setVolume((1 - percent) * Core.instance.sfxVolume);
                 }
             }, Actions.delay(1f), new Action() {
                 @Override

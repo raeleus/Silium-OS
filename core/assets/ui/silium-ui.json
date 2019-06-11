@@ -215,6 +215,18 @@
 	"text-selection": {
 		"name": "white",
 		"color": "text-selection"
+	},
+	"button-red": {
+		"name": "button",
+		"color": "red"
+	},
+	"button-over-red": {
+		"name": "button-over",
+		"color": "red"
+	},
+	"button-pressed-red": {
+		"name": "button-pressed",
+		"color": "red"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
@@ -237,6 +249,11 @@
 		"up": "button-menu-settings-tinted",
 		"down": "button-menu-settings-pressed-tinted",
 		"over": "button-menu-settings-over-tinted"
+	},
+	"red": {
+		"up": "button-red",
+		"down": "button-pressed-red",
+		"over": "button-over-red"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
@@ -297,6 +314,14 @@
 		"down": "tab-pressed-tinted",
 		"over": "tab-over-tinted",
 		"checked": "tab-pressed-tinted"
+	},
+	"red": {
+		"font": "font-button",
+		"fontColor": "red",
+		"downFontColor": "black",
+		"up": "button-red",
+		"down": "button-pressed-red",
+		"over": "button-over-red"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle": {

@@ -17,6 +17,7 @@ public class Core extends Game {
     public Music currentVoice;
     public float bgmVolume = .25f;
     public float sfxVolume = 1f;
+    public CrossPlatformWorker crossPlatformWorker;
     
     public final static String VERSION = "1.0";
     @Override
@@ -27,7 +28,7 @@ public class Core extends Game {
         
         addAssets();
         
-        setScreen(new GameScreen());
+        setScreen(new GameOverBScreen());
     }
     
     private void addAssets() {
