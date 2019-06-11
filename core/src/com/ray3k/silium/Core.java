@@ -36,9 +36,9 @@ public class Core extends Game {
     }
     
     private void addAssets() {
-        users = new Array<String>(Gdx.files.internal("data/users.txt").readString().split("\\n"));
-        passwords = new Array<String>(Gdx.files.internal("data/passwords.txt").readString().split("\\n"));
-        vulnerabilities = new Array<String>(Gdx.files.internal("data/vulnerabilities.txt").readString().split("\\n"));
+        users = new Array<String>(Gdx.files.internal("data/users.txt").readString().replaceAll("\\r", "").split("\\n"));
+        passwords = new Array<String>(Gdx.files.internal("data/passwords.txt").readString().replaceAll("\\r", "").split("\\n"));
+        vulnerabilities = new Array<String>(Gdx.files.internal("data/vulnerabilities.txt").readString().replaceAll("\\r", "").split("\\n"));
         
         assetManager = new AssetManager(new InternalFileHandleResolver());
         assetManager.load("ui/silium-ui.json", Skin.class);

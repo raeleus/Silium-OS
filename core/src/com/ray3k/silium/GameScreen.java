@@ -41,7 +41,8 @@ public class GameScreen implements Screen {
     private TtyMode tty2Mode;
     private Table root;
     ButtonGroup<TextButton> tabButtonGroup;
-    public Array<Server> servers;
+    private Array<Server> servers;
+    private Server connectedServer;
     
     @Override
     public void show() {
@@ -431,7 +432,33 @@ public class GameScreen implements Screen {
                     }
                 }
             } else if (text.startsWith("ssh")) {
+                String[] split = text.split("\\s");
+                if (split.length != 4 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+                    returnValue = "{FASTER}Incorrect paramaters for ssh command. Type \"help\" and press enter to list available commands.";
+                } else {
+                    Server matchedServer = null;
+                    for (Server server : servers) {
+                        if (server.address.equalsIgnoreCase(split[1])) {
+                            matchedServer = server;
+                            break;
+                        }
+                    }
         
+                    if (matchedServer != null) {
+                        if (matchedServer.user.equals(split[2]) && matchedServer.password.equals(split[3])) {
+                            if (tab == Tab.TTY1) {
+                                tty1Mode = TtyMode.SERVER;
+                                connectedServer = matchedServer;
+                                returnValue = "{FASTER}Connected to " + matchedServer.address + ". Welcome " + matchedServer.user + "!";
+                                Core.instance.playVoice(8);
+                            }
+                        } else {
+                            returnValue = "{FASTER}Username or password is incorrect. Type \"help\" and press enter to list available commands.";
+                        }
+                    } else {
+                        returnValue = "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
+                    }
+                }
             } else if (text.equalsIgnoreCase("swordfish")) {
                 returnValue = "{FASTER}CLAUS: Ahh fooey! The connection dropped!\nSYSADMIN: WTH? Why am I still getting your messages?\nCLAUS: I'm transmitting through an intermediary right now, but the connection is {SHAKE}shakey!{ENDSHAKE}\nSYSADMIN: Alright, sign off and sign back on. It should be fixed now.\n{SLOW}{WAVE}USER HAS DISCONNECTED";
             }
@@ -440,7 +467,19 @@ public class GameScreen implements Screen {
                 returnValue += "{FASTER}Unknown command: \"" + text + "\"\nType \"help\" and press enter to list available commands.";
             }
         } else if (ttyMode == TtyMode.SERVER) {
-        
+            if (text.equalsIgnoreCase("help")) {
+                returnValue += "{FASTER}Welcome to Silium OS Remote Terminal\n";
+                returnValue += "The following commands can be entered while logged into a remote system:\n";
+                returnValue += "help {COLOR=#FFFFFFAA}This command list{CLEARCOLOR}\n";
+                returnValue += "clear {COLOR=#FFFFFFAA}Clears all text from the TTY{CLEARCOLOR}\n";
+                returnValue += "ls {COLOR=#FFFFFFAA}list all files and directories in the current folder{CLEARCOLOR}\n";
+                returnValue += "cd <path> {COLOR=#FFFFFFAA}navigate to specified folder{CLEARCOLOR}\n";
+                returnValue += "cd.. {COLOR=#FFFFFFAA}return to parent folder{CLEARCOLOR}\n";
+                returnValue += "read <filename> {COLOR=#FFFFFFAA}read the contents of a file{CLEARCOLOR}\n";
+                returnValue += "del <filename> {COLOR=#FFFFFFAA}delete the specified file{CLEARCOLOR}\n";
+                returnValue += "exit {COLOR=#FFFFFFAA}disconnect from system{CLEARCOLOR}\n";
+                returnValue += "Press tab to autocomplete filenames";
+            }
         } else {
         }
         
@@ -505,7 +544,7 @@ public class GameScreen implements Screen {
             sequenceAction.addAction(new Action() {
                 @Override
                 public boolean act(float delta) {
-                    String message = "{FASTER}\nSuccessfully Hacked.\nUsername is " + server.user + "\nPassword is " + server.password;
+                    String message = "{FASTER}\nSuccessfully Hacked " + server.address + "\nUsername is " + server.user + "\nPassword is " + server.password;
                     tty1Messages.add(message);
                     Table subTable = root.findActor("tty1-message-table");
                     subTable.row();
@@ -518,6 +557,8 @@ public class GameScreen implements Screen {
                     scrollPane.layout();
                     scrollPane.setScrollPercentY(1);
                     tty1Mode = TtyMode.NETWORK;
+                    
+                    Core.instance.playVoice(7);
                     return true;
                 }
             });
@@ -557,7 +598,7 @@ public class GameScreen implements Screen {
             sequenceAction.addAction(new Action() {
                 @Override
                 public boolean act(float delta) {
-                    String message = "{FASTER}\nSuccessfully Hacked.\nUsername is " + server.user + "\nPassword is " + server.password;
+                    String message = "{FASTER}\nSuccessfully Hacked " + server.address + "\nUsername is " + server.user + "\nPassword is " + server.password;
                     tty1Messages.add(message);
                     Table subTable = root.findActor("tty1-message-table");
                     subTable.row();
@@ -570,6 +611,8 @@ public class GameScreen implements Screen {
                     scrollPane.layout();
                     scrollPane.setScrollPercentY(1);
                     tty1Mode = TtyMode.NETWORK;
+    
+                    Core.instance.playVoice(7);
                     return true;
                 }
             });
