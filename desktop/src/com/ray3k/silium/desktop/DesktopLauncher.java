@@ -9,7 +9,8 @@ import com.ray3k.silium.CrossPlatformWorker;
 public class DesktopLauncher implements CrossPlatformWorker {
     public static void main (String[] arg) {
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-        config.width = 800;
+        config.width = 1024;
+        config.height = 576;
         Core core = new Core();
         core.crossPlatformWorker = new DesktopLauncher();
         new LwjglApplication(core, config);
