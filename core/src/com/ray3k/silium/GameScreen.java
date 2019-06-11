@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
@@ -40,9 +41,13 @@ public class GameScreen implements Screen {
     private TtyMode tty2Mode;
     private Table root;
     ButtonGroup<TextButton> tabButtonGroup;
+    public Array<Server> servers;
     
     @Override
     public void show() {
+        servers = new Array<Server>();
+        refreshServers();
+        
         tty1Path = "/> ";
         tty1Messages = new Array<String>();
         tty1Messages.add("{FASTER}Type \"help\" and press enter to list available commands.");
@@ -364,9 +369,10 @@ public class GameScreen implements Screen {
         if (ttyMode == TtyMode.NETWORK) {
             if (text.equalsIgnoreCase("help")) {
                 returnValue += "{FASTER}Welcome to Silium OS Command\n";
-                returnValue += "The following commands can be entered while logged into the NETWORK:\n";
+                returnValue += "The following commands can be entered while logged into the network:\n";
                 returnValue += "help {COLOR=#FFFFFFAA}This command list{CLEARCOLOR}\n";
                 returnValue += "clear {COLOR=#FFFFFFAA}Clears all text from the TTY{CLEARCOLOR}\n";
+                returnValue += "nmap {COLOR=#FFFFFFAA}Lists all servers connected on the network{CLEARCOLOR}\n";
                 returnValue += "brt <ip address> {COLOR=#FFFFFFAA}Initiate a brute force password hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}";
@@ -375,14 +381,31 @@ public class GameScreen implements Screen {
                     tty1Messages.clear();
                     createTTY1();
                 }
+            } else if (text.equalsIgnoreCase("nmap")) {
+                returnValue += "{FASTER}Network Map:";
+                for (Server server : servers) {
+                    returnValue += "\n" + server.address;
+                }
             } else if (text.startsWith("brt")) {
                 String[] split = text.split("\\s");
                 if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
                     returnValue = "{FASTER}Incorrect paramaters for brt command. Type \"help\" and press enter to list available commands.";
                 } else {
-                    if (tab == Tab.TTY1) {
-                        tty1Mode = TtyMode.BRUTE_FORCE;
-                        animateBruteForce();
+                    Server matchedServer = null;
+                    for (Server server : servers) {
+                        if (server.address.equalsIgnoreCase(split[1])) {
+                            matchedServer = server;
+                            break;
+                        }
+                    }
+                    
+                    if (matchedServer != null) {
+                        if (tab == Tab.TTY1) {
+                            tty1Mode = TtyMode.BRUTE_FORCE;
+                            animateBruteForce(matchedServer);
+                        }
+                    } else {
+                        returnValue = "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
             } else if (text.startsWith("vul")) {
@@ -390,9 +413,21 @@ public class GameScreen implements Screen {
                 if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
                     returnValue = "{FASTER}Incorrect paramaters for vul command. Type \"help\" and press enter to list available commands.";
                 } else {
-                    if (tab == Tab.TTY1) {
-                        tty1Mode = TtyMode.BRUTE_FORCE;
-                        animateVulnerability();
+                    Server matchedServer = null;
+                    for (Server server : servers) {
+                        if (server.address.equalsIgnoreCase(split[1])) {
+                            matchedServer = server;
+                            break;
+                        }
+                    }
+    
+                    if (matchedServer != null) {
+                        if (tab == Tab.TTY1) {
+                            tty1Mode = TtyMode.BRUTE_FORCE;
+                            animateVulnerability(matchedServer);
+                        }
+                    } else {
+                        returnValue = "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
             } else if (text.startsWith("ssh")) {
@@ -439,7 +474,7 @@ public class GameScreen implements Screen {
         return returnValue;
     }
     
-    private void animateBruteForce() {
+    private void animateBruteForce(final Server server) {
         SequenceAction sequenceAction = new SequenceAction();
         
         for (int i = 0; i < 200; i++) {
@@ -465,15 +500,12 @@ public class GameScreen implements Screen {
                 sequenceAction.addAction(Actions.delay(.1f));
             }
         }
-        
-        final String user = Core.instance.users.random();
-        final String password = Core.instance.passwords.random();
     
         if (tab == Tab.TTY1) {
             sequenceAction.addAction(new Action() {
                 @Override
                 public boolean act(float delta) {
-                    String message = "{FASTER}\nSuccessfully Hacked.\nUsername is " + user + "\nPassword is " + password;
+                    String message = "{FASTER}\nSuccessfully Hacked.\nUsername is " + server.user + "\nPassword is " + server.password;
                     tty1Messages.add(message);
                     Table subTable = root.findActor("tty1-message-table");
                     subTable.row();
@@ -485,6 +517,7 @@ public class GameScreen implements Screen {
                     scrollPane.layout();
                     scrollPane.layout();
                     scrollPane.setScrollPercentY(1);
+                    tty1Mode = TtyMode.NETWORK;
                     return true;
                 }
             });
@@ -493,7 +526,7 @@ public class GameScreen implements Screen {
         stage.addAction(sequenceAction);
     }
     
-    private void animateVulnerability() {
+    private void animateVulnerability(final Server server) {
         SequenceAction sequenceAction = new SequenceAction();
         
         for (int i = 0; i < 200; i++) {
@@ -520,14 +553,11 @@ public class GameScreen implements Screen {
             }
         }
         
-        final String user = Core.instance.users.random();
-        final String password = Core.instance.passwords.random();
-        
         if (tab == Tab.TTY1) {
             sequenceAction.addAction(new Action() {
                 @Override
                 public boolean act(float delta) {
-                    String message = "{FASTER}\nSuccessfully Hacked.\nUsername is " + user + "\nPassword is " + password;
+                    String message = "{FASTER}\nSuccessfully Hacked.\nUsername is " + server.user + "\nPassword is " + server.password;
                     tty1Messages.add(message);
                     Table subTable = root.findActor("tty1-message-table");
                     subTable.row();
@@ -539,6 +569,7 @@ public class GameScreen implements Screen {
                     scrollPane.layout();
                     scrollPane.layout();
                     scrollPane.setScrollPercentY(1);
+                    tty1Mode = TtyMode.NETWORK;
                     return true;
                 }
             });
@@ -631,6 +662,25 @@ public class GameScreen implements Screen {
                 return true;
             }
         }));
+    }
+    
+    public void refreshServers() {
+        servers.clear();
+        for(int i = 0; i < 5; i++) {
+            servers.add(new Server());
+        }
+    }
+    
+    private static class Server {
+        String address;
+        String user;
+        String password;
+        
+        public Server() {
+            address = MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255);
+            user = Core.instance.users.random();
+            password = Core.instance.passwords.random();
+        }
     }
     
     @Override
