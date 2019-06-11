@@ -26,6 +26,7 @@ public class PlayList implements Music.OnCompletionListener {
     
     public void play() {
         musics.get(index).stop();
+        musics.get(index).setVolume(.1f);
         musics.get(index).play();
     }
     

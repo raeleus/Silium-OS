@@ -33,6 +33,7 @@ public class IntroScreen implements Screen {
         skin = Core.instance.assetManager.get("ui/silium-ui.json");
         
         music = Core.instance.assetManager.get("music/snd_theme_prophecy.mp3");
+        music.setVolume(1f);
         music.setLooping(true);
         music.play();
     

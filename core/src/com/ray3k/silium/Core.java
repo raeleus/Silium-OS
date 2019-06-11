@@ -57,7 +57,6 @@ public class Core extends Game {
         musics.add(assetManager.get("music/04 He Eludes Us.mp3", Music.class));
         musics.add(assetManager.get("music/05 To Seek Find And Capture.mp3", Music.class));
         playList = new PlayList(musics);
-        playList.setVolume(.1f);
     }
     
     @Override
@@ -69,6 +68,7 @@ public class Core extends Game {
     
     public Music playVoice(int number) {
         Music music = assetManager.get("voice/" + Integer.toString(number) + "-Mix.mp3");
+        music.setVolume(1);
         music.play();
         currentVoice = music;
         return music;

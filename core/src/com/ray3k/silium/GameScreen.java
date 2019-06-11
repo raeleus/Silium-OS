@@ -6,6 +6,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
@@ -31,7 +32,7 @@ public class GameScreen implements Screen {
     private String tty2Path;
     private Array<String> tty2Messages;
     private enum TtyMode {
-        DISABLED, NETWORK, SERVER
+        DISABLED, NETWORK, SERVER, BLACK_WEB, NOC
     }
     private TtyMode tty1Mode;
     private TtyMode tty2Mode;
@@ -84,9 +85,21 @@ public class GameScreen implements Screen {
     
         Button button = new Button(skin,"menu-settings");
         table.add(button);
+        button.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                DialogParameters.show(skin, stage);
+            }
+        });
     
         button = new Button(skin,"menu-close");
         table.add(button);
+        button.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                changeScreen(new IntroScreen());
+            }
+        });
         
         root.row();
         Table bottom = new Table();
@@ -301,6 +314,31 @@ public class GameScreen implements Screen {
         tab = Tab.TTY1;
     }
     
+    private void changeScreen(final Screen screen) {
+        transitioning = true;
+        stage.addAction(Actions.sequence(Actions.fadeOut(1), Actions.parallel(new TemporalAction(1) {
+            float currentVolume = Core.instance.playList.getCurrent().getVolume();
+    
+            @Override
+            protected void update(float percent) {
+                Core.instance.playList.setVolume((1 - percent) * currentVolume);
+            }
+        }, new TemporalAction(1) {
+            float currentVolume = Core.instance.currentVoice.getVolume();
+            
+            @Override
+            protected void update(float percent) {
+                Core.instance.currentVoice.setVolume((1 - percent) * currentVolume);
+            }
+        }), new Action() {
+            @Override
+            public boolean act(float delta) {
+                Core.instance.setScreen(screen);
+                return true;
+            }
+        }));
+    }
+    
     private String interpretCommand(TtyMode ttyMode,  String text) {
         String returnValue = "";
         
@@ -467,7 +505,7 @@ public class GameScreen implements Screen {
     
     @Override
     public void hide() {
-    
+        Core.instance.playList.stop();
     }
     
     @Override
