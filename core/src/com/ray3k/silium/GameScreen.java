@@ -14,7 +14,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.esotericsoftware.spine.utils.TwoColorPolygonBatch;
 import com.rafaskoberg.gdx.typinglabel.TypingAdapter;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
 
@@ -59,7 +58,7 @@ public class GameScreen implements Screen {
         tty2Messages.add("{FASTER}Type \"help\" and press enter to list available commands.");
         tty2Mode = TtyMode.DISABLED;
         
-        stage = new Stage(new ScreenViewport(), new TwoColorPolygonBatch());
+        stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         stage.addListener(new InputListener() {
             @Override
@@ -287,16 +286,8 @@ public class GameScreen implements Screen {
         final TextField textField = new TextField("", skin);
         textField.setName("tty1-field");
         textField.setFocusTraversal(false);
-        textField.setTextFieldFilter(new TextField.TextFieldFilter() {
-            @Override
-            public boolean acceptChar(TextField textField, char c) {
-                if (c == '\t') {
-                    return false;
-                } else {
-                    return true;
-                }
-            }
-        });
+        final KeyFilter keyFilter = new KeyFilter();
+        textField.setTextFieldFilter(keyFilter);
         subTable.add(textField).growX().expandY().top().minWidth(50);
         textField.addListener(new InputListener() {
             @Override
@@ -324,9 +315,11 @@ public class GameScreen implements Screen {
                 } else if (keycode == Input.Keys.TAB) {
                     textField.setText(autoComplete(tty1Mode, textField.getText()));
                     textField.setCursorPosition(textField.getText().length());
-                } else if (keycode == Input.Keys.SPACE && Gdx.app.getType() == Application.ApplicationType.WebGL) {
+                } else if (keycode == Input.Keys.SPACE) {
                     int position = textField.getCursorPosition();
+                    keyFilter.acceptSpace = true;
                     textField.setText(textField.getText().substring(0,position) + " " + textField.getText().substring(position));
+                    keyFilter.acceptSpace = false;
                     textField.setCursorPosition(position + 1);
                     return true;
                 }
@@ -339,9 +332,28 @@ public class GameScreen implements Screen {
         tab = Tab.TTY1;
     }
     
+    private class KeyFilter implements TextField.TextFieldFilter {
+        boolean acceptSpace = false;
+        
+        @Override
+        public boolean acceptChar(TextField textField, char c) {
+            if (c == '\t') {
+                return false;
+            } if (c == ' ') {
+                return acceptSpace;
+            } else {
+                return true;
+            }
+        }
+    }
+    
     private void changeScreen(final Screen screen) {
+        changeScreen(screen,0);
+    }
+    
+    private void changeScreen(final Screen screen, float delay) {
         transitioning = true;
-        stage.addAction(Actions.sequence(Actions.fadeOut(1), Actions.parallel(new TemporalAction(1) {
+        stage.addAction(Actions.sequence(Actions.delay(delay), Actions.fadeOut(1), Actions.parallel(new TemporalAction(1) {
             float currentVolume = Core.instance.playList.getCurrent().getVolume();
     
             @Override
@@ -365,7 +377,7 @@ public class GameScreen implements Screen {
     }
     
     private String interpretCommand(TtyMode ttyMode,  String text) {
-        String returnValue = "";
+        String returnValue = text + "\n";
         
         if (ttyMode == TtyMode.NETWORK) {
             if (text.equalsIgnoreCase("help")) {
@@ -376,7 +388,9 @@ public class GameScreen implements Screen {
                 returnValue += "nmap {COLOR=#FFFFFFAA}Lists all servers connected on the network{CLEARCOLOR}\n";
                 returnValue += "brt <ip address> {COLOR=#FFFFFFAA}Initiate a brute force password hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
-                returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}";
+                returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}\n";
+                returnValue += "upgrade {COLOR=#FFFFFFAA}Upgrade Uni Ver to version 2.0{CLEARCOLOR}\n";
+                returnValue += "logoff -u {COLOR=#FFFFFFAA}Shutdown Uni Ver{CLEARCOLOR}";
             } else if (text.equalsIgnoreCase("clear")) {
                 if (tab == tab.TTY1) {
                     tty1Messages.clear();
@@ -390,7 +404,7 @@ public class GameScreen implements Screen {
             } else if (text.startsWith("brt")) {
                 String[] split = text.split("\\s");
                 if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
-                    returnValue = "{FASTER}Incorrect paramaters for brt command. Type \"help\" and press enter to list available commands.";
+                    returnValue += "{FASTER}Incorrect paramaters for brt command. Type \"help\" and press enter to list available commands.";
                 } else {
                     Server matchedServer = null;
                     for (Server server : servers) {
@@ -406,13 +420,13 @@ public class GameScreen implements Screen {
                             animateBruteForce(matchedServer);
                         }
                     } else {
-                        returnValue = "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
+                        returnValue += "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
             } else if (text.startsWith("vul")) {
                 String[] split = text.split("\\s");
                 if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
-                    returnValue = "{FASTER}Incorrect paramaters for vul command. Type \"help\" and press enter to list available commands.";
+                    returnValue += "{FASTER}Incorrect paramaters for vul command. Type \"help\" and press enter to list available commands.";
                 } else {
                     Server matchedServer = null;
                     for (Server server : servers) {
@@ -428,13 +442,13 @@ public class GameScreen implements Screen {
                             animateVulnerability(matchedServer);
                         }
                     } else {
-                        returnValue = "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
+                        returnValue += "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
             } else if (text.startsWith("ssh")) {
                 String[] split = text.split("\\s");
                 if (split.length != 4 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
-                    returnValue = "{FASTER}Incorrect paramaters for ssh command. Type \"help\" and press enter to list available commands.";
+                    returnValue += "{FASTER}Incorrect paramaters for ssh command. Type \"help\" and press enter to list available commands.";
                 } else {
                     Server matchedServer = null;
                     for (Server server : servers) {
@@ -453,14 +467,20 @@ public class GameScreen implements Screen {
                                 Core.instance.playVoice(8);
                             }
                         } else {
-                            returnValue = "{FASTER}Username or password is incorrect. Type \"help\" and press enter to list available commands.";
+                            returnValue += "{FASTER}Username or password is incorrect. Type \"help\" and press enter to list available commands.";
                         }
                     } else {
-                        returnValue = "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
+                        returnValue += "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
             } else if (text.equalsIgnoreCase("swordfish")) {
-                returnValue = "{FASTER}CLAUS: Ahh fooey! The connection dropped!\nSYSADMIN: WTH? Why am I still getting your messages?\nCLAUS: I'm transmitting through an intermediary right now, but the connection is {SHAKE}shakey!{ENDSHAKE}\nSYSADMIN: Alright, sign off and sign back on. It should be fixed now.\n{SLOW}{WAVE}USER HAS DISCONNECTED";
+                returnValue += "{FASTER}CLAUS: Ahh fooey! The connection dropped!\nSYSADMIN: WTH? Why am I still getting your messages?\nCLAUS: I'm transmitting through an intermediary right now, but the connection is {SHAKE}shakey!{ENDSHAKE}\nSYSADMIN: Alright, sign off and sign back on. It should be fixed now.\n{SLOW}{WAVE}USER HAS DISCONNECTED";
+            }  else if (text.equalsIgnoreCase("upgrade")) {
+                returnValue += "{FASTER}Upgrade installing, please wait...\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............";
+                changeScreen(new GameOverAScreen(), 5);
+            }  else if (text.equalsIgnoreCase("logoff -u")) {
+                returnValue += "{FASTER}Shutting down, please wait...\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............";
+                changeScreen(new GameOverBScreen(), 5);
             }
             
             else {
@@ -479,6 +499,20 @@ public class GameScreen implements Screen {
                 returnValue += "del <filename> {COLOR=#FFFFFFAA}delete the specified file{CLEARCOLOR}\n";
                 returnValue += "exit {COLOR=#FFFFFFAA}disconnect from system{CLEARCOLOR}\n";
                 returnValue += "Press tab to autocomplete filenames";
+            } else if (text.equalsIgnoreCase("clear")) {
+            
+            } else if (text.equalsIgnoreCase("ls")) {
+    
+            } else if (text.startsWith("cd")) {
+    
+            } else if (text.equalsIgnoreCase("cd..")) {
+    
+            } else if (text.startsWith("read")) {
+    
+            } else if (text.startsWith("del")) {
+    
+            } else if (text.equalsIgnoreCase("exit")) {
+                returnValue += "Disconnected from server";
             }
         } else {
         }
