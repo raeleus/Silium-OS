@@ -21,6 +21,7 @@ public class PlayList implements Music.OnCompletionListener {
         index++;
         if (index >= musics.size) index = 0;
         
+        musics.get(index).setVolume(Core.instance.bgmVolume);
         musics.get(index).play();
     }
     
