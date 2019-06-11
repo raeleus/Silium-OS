@@ -1,6 +1,7 @@
 package com.ray3k.silium;
 
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
@@ -10,6 +11,8 @@ import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.SkeletonRenderer;
 
 public class Core extends Game {
+    public Array<String> users;
+    public Array<String> passwords;
     public static Core instance;
     public SkeletonRenderer skeletonRenderer;
     public AssetManager assetManager;
@@ -32,6 +35,9 @@ public class Core extends Game {
     }
     
     private void addAssets() {
+        users = new Array<String>(Gdx.files.internal("data/users.txt").readString().split("\\n"));
+        passwords = new Array<String>(Gdx.files.internal("data/passwords.txt").readString().split("\\n"));
+        
         assetManager = new AssetManager(new InternalFileHandleResolver());
         assetManager.load("ui/silium-ui.json", Skin.class);
         assetManager.setLoader(SkeletonData.class, new SkeletonDataLoader(assetManager.getFileHandleResolver()));

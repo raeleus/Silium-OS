@@ -1,11 +1,13 @@
 package com.ray3k.silium;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -32,7 +34,7 @@ public class GameScreen implements Screen {
     private String tty2Path;
     private Array<String> tty2Messages;
     private enum TtyMode {
-        DISABLED, NETWORK, SERVER, BLACK_WEB, NOC
+        DISABLED, NETWORK, SERVER, BRUTE_FORCE, VULNERABILITY, BLACK_WEB, NOC
     }
     private TtyMode tty1Mode;
     private TtyMode tty2Mode;
@@ -304,6 +306,11 @@ public class GameScreen implements Screen {
                 } else if (keycode == Input.Keys.TAB) {
                     textField.setText(autoComplete(tty1Mode, textField.getText()));
                     textField.setCursorPosition(textField.getText().length());
+                } else if (keycode == Input.Keys.SPACE && Gdx.app.getType() == Application.ApplicationType.WebGL) {
+                    int position = textField.getCursorPosition();
+                    textField.setText(textField.getText().substring(0,position) + " " + textField.getText().substring(position));
+                    textField.setCursorPosition(position + 1);
+                    return true;
                 }
                 return super.keyDown(event, keycode);
             }
@@ -351,6 +358,25 @@ public class GameScreen implements Screen {
                 returnValue += "brt <ip address> {COLOR=#FFFFFFAA}Initiate a brute force password hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}";
+            } else if (text.equalsIgnoreCase("clear")) {
+                if (tab == tab.TTY1) {
+                    tty1Messages.clear();
+                    createTTY1();
+                }
+            } else if (text.startsWith("brt")) {
+                String[] split = text.split("\\s");
+                if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
+                    returnValue = "{FASTER}Incorrect paramaters for brt command. Type \"help\" and press enter to list available commands.";
+                } else {
+                    if (tab == Tab.TTY1) {
+                        tty1Mode = TtyMode.BRUTE_FORCE;
+                        animateBruteForce();
+                    }
+                }
+            } else if (text.startsWith("vul")) {
+        
+            } else if (text.startsWith("ssh")) {
+        
             } else {
                 returnValue += "{FASTER}Unknown command: \"" + text + "\"\nType \"help\" and press enter to list available commands.";
             }
@@ -387,6 +413,60 @@ public class GameScreen implements Screen {
         }
         
         return returnValue;
+    }
+    
+    private void animateBruteForce() {
+        SequenceAction sequenceAction = new SequenceAction();
+        
+        for (int i = 0; i < 200; i++) {
+            if (tab == Tab.TTY1) {
+                sequenceAction.addAction(new Action() {
+                    @Override
+                    public boolean act(float delta) {
+                        String password = "{FASTER}" + Core.instance.passwords.random();
+                        tty1Messages.add(password);
+                        Table subTable = root.findActor("tty1-message-table");
+                        subTable.row();
+                        TypingLabel typingLabel = new TypingLabel(password, skin);
+                        typingLabel.setWrap(true);
+                        subTable.add(typingLabel).growX();
+    
+                        ScrollPane scrollPane = root.findActor("tty1-message-scroll");
+                        scrollPane.layout();
+                        scrollPane.layout();
+                        scrollPane.setScrollPercentY(1);
+                        return true;
+                    }
+                });
+                sequenceAction.addAction(Actions.delay(.1f));
+            }
+        }
+        
+        final String user = Core.instance.users.random();
+        final String password = Core.instance.passwords.random();
+    
+        if (tab == Tab.TTY1) {
+            sequenceAction.addAction(new Action() {
+                @Override
+                public boolean act(float delta) {
+                    String message = "{FASTER}Successfully Hacked.\nUsername is " + user + "\nPassword is " + password;
+                    tty1Messages.add(message);
+                    Table subTable = root.findActor("tty1-message-table");
+                    subTable.row();
+                    TypingLabel typingLabel = new TypingLabel(message, skin);
+                    typingLabel.setWrap(true);
+                    subTable.add(typingLabel).growX();
+                
+                    ScrollPane scrollPane = root.findActor("tty1-message-scroll");
+                    scrollPane.layout();
+                    scrollPane.layout();
+                    scrollPane.setScrollPercentY(1);
+                    return true;
+                }
+            });
+        }
+        
+        stage.addAction(sequenceAction);
     }
     
     private void createTTY2() {
