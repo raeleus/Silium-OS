@@ -15,6 +15,8 @@ public class Core extends Game {
     public AssetManager assetManager;
     public PlayList playList;
     public Music currentVoice;
+    public float bgmVolume = .25f;
+    public float sfxVolume = 1f;
     
     public final static String VERSION = "1.0";
     @Override
@@ -44,8 +46,8 @@ public class Core extends Game {
         assetManager.load("music/05 To Seek Find And Capture.mp3", Music.class);
         assetManager.load("music/snd_theme_prophecy.mp3", Music.class);
     
-        for (int i = 1; i <=25; i++) {
-            assetManager.load("voice/" + Integer.toString(i) + "-Mix.mp3", Music.class);
+        for (int i = 1; i <= 25; i++) {
+            assetManager.load("voice/" + i + "-Mix.mp3", Music.class);
         }
         
         assetManager.finishLoading();
@@ -68,7 +70,7 @@ public class Core extends Game {
     
     public Music playVoice(int number) {
         Music music = assetManager.get("voice/" + Integer.toString(number) + "-Mix.mp3");
-        music.setVolume(1);
+        music.setVolume(Core.instance.sfxVolume);
         music.play();
         currentVoice = music;
         return music;

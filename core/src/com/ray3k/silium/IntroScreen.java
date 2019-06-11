@@ -33,7 +33,7 @@ public class IntroScreen implements Screen {
         skin = Core.instance.assetManager.get("ui/silium-ui.json");
         
         music = Core.instance.assetManager.get("music/snd_theme_prophecy.mp3");
-        music.setVolume(1f);
+        music.setVolume(1);
         music.setLooping(true);
         music.play();
     
@@ -81,7 +81,7 @@ public class IntroScreen implements Screen {
             stage.addAction(Actions.sequence(Actions.fadeOut(1f), new TemporalAction(1f) {
                 @Override
                 protected void update(float percent) {
-                    music.setVolume(1 - percent);
+                    music.setVolume((1 - percent) * 1);
                 }
             }, Actions.delay(1f), new Action() {
                 @Override

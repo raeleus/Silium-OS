@@ -145,7 +145,7 @@ public class MenuScreen implements Screen {
                         stage.addAction(Actions.sequence(new TemporalAction(.5f) {
                             @Override
                             protected void update(float percent) {
-                                Core.instance.currentVoice.setVolume(1 - percent);
+                                Core.instance.currentVoice.setVolume((1 - percent) * Core.instance.sfxVolume);
                             }
                         }, new Action() {
                             @Override

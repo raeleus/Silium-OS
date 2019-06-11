@@ -28,14 +28,31 @@ public class DialogParameters extends Dialog {
         root.add(label).padLeft(8);
         
         Slider slider = new Slider(0, 1, .01f, false, skin);
+        slider.setValue(Core.instance.sfxVolume);
         root.add(slider);
+        slider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.sfxVolume = ((Slider) actor).getValue();
+                Core.instance.currentVoice.setVolume(Core.instance.sfxVolume);
+                if (!Core.instance.currentVoice.isPlaying()) Core.instance.currentVoice.play();
+            }
+        });
         
         root.row();
         label = new Label("BGM",skin);
         root.add(label).padLeft(8);
         
         slider = new Slider(0, 1, .01f, false, skin);
+        slider.setValue(Core.instance.bgmVolume);
         root.add(slider);
+        slider.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.bgmVolume = ((Slider) actor).getValue();
+                Core.instance.playList.setVolume(Core.instance.bgmVolume);
+            }
+        });
         
         key(Input.Keys.ESCAPE, null).key(Input.Keys.ENTER,null);
     }
