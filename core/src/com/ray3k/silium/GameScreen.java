@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rafaskoberg.gdx.typinglabel.TypingAdapter;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
 import jdk.nashorn.internal.ir.IfNode;
+import sun.rmi.runtime.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -867,6 +868,9 @@ public class GameScreen implements Screen {
                 allPaths.removeIndex(index);
                 allContents.removeIndex(index);
             }
+            
+            filePaths.add("log.txt");
+            fileContents.add("User \"OPERATOR\" (" + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + ") connected at " + TimeUtils.millis());
         }
     }
     
