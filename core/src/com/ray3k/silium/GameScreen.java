@@ -488,6 +488,16 @@ public class GameScreen implements Screen {
                                     Core.instance.playVoice(8);
                                     tutorialLevel = 8;
                                 }
+                                
+                                if (tutorialLevel >= 10) {
+                                    stage.addAction(Actions.sequence(Actions.delay(10), new Action() {
+                                        @Override
+                                        public boolean act(float delta) {
+                                            initiateTrace();
+                                            return true;
+                                        }
+                                    }));
+                                }
                             }
                         } else {
                             returnValue += "{FASTER}Username or password is incorrect. Type \"help\" and press enter to list available commands.";
@@ -531,6 +541,19 @@ public class GameScreen implements Screen {
                 if (tutorialLevel < 9) {
                     Core.instance.playVoice(9);
                     tutorialLevel = 9;
+    
+                    stage.addAction(Actions.sequence(Actions.delay(10), new Action() {
+                        @Override
+                        public boolean act(float delta) {
+                            if (tutorialLevel < 10) {
+                                Core.instance.playVoice(10);
+                                tutorialLevel = 10;
+                            }
+                            
+                            initiateTrace();
+                            return true;
+                        }
+                    }));
                 }
                 Array<String> paths = new Array<String>(connectedServer.filePaths);
                 Iterator<String> iter = paths.iterator();
@@ -615,12 +638,53 @@ public class GameScreen implements Screen {
                 Label label = root.findActor("tty1-path-label");
                 label.setText("/" + tty1Path + ">");
                 tty1Mode = TtyMode.NETWORK;
+                
+                if (!connectedServer.filePaths.contains("log.txt",false) && tutorialLevel < 12) {
+                    Core.instance.playVoice(12);
+                    tutorialLevel = 12;
+                }
             }
         } else {
             returnValue += "{FASTER}Error: Terminal not Responding";
         }
         
         return returnValue;
+    }
+    
+    private void initiateTrace() {
+        stage.addAction(Actions.delay(20, new Action() {
+            @Override
+            public boolean act(float delta) {
+                if (tty1Mode == TtyMode.SERVER || connectedServer.filePaths.contains("log.txt",false)) {
+                    Core.instance.playVoice(11);
+                    
+                    if (tty1Mode == TtyMode.SERVER) {
+                        tty1Path = "";
+                        Label label = root.findActor("tty1-path-label");
+                        label.setText("/" + tty1Path + ">");
+                        tty1Mode = TtyMode.NETWORK;
+                        tty1Messages.add("Disconnected from server");
+    
+                        Table subTable = root.findActor("tty1-message-table");
+                        for (Actor actor : subTable.getChildren()) {
+                            ((TypingLabel) actor).skipToTheEnd();
+                        }
+    
+                        stage.addAction(Actions.delay(12, new Action() {
+                            @Override
+                            public boolean act(float delta) {
+                                if (tutorialLevel < 12) {
+                                    Core.instance.playVoice(12);
+                                    tutorialLevel = 12;
+                                }
+                                return true;
+                            }
+                        }));
+                    }
+                }
+                return true;
+            }
+        }));
     }
     
     private String autoComplete(TtyMode ttyMode, String text) {
