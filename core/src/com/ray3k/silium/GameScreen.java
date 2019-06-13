@@ -417,7 +417,7 @@ public class GameScreen implements Screen {
                 returnValue += "clear {COLOR=#FFFFFFAA}Clears all text from the TTY{CLEARCOLOR}\n";
                 returnValue += "nmap {COLOR=#FFFFFFAA}Lists all servers connected on the network{CLEARCOLOR}\n";
                 returnValue += "brt <ip address> {COLOR=#FFFFFFAA}Initiate a brute force password hack on the specified IP address{CLEARCOLOR}\n";
-                returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
+                if (vulnerabilityModule) returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}\n";
                 returnValue += "store {COLOR=#FFFFFFAA}Lists available upgrades for purchase with Kreddits{CLEARCOLOR}\n";
                 returnValue += "upgrade {COLOR=#FFFFFFAA}Upgrade Uni Ver to version 2.0{CLEARCOLOR}\n";
@@ -460,7 +460,7 @@ public class GameScreen implements Screen {
                         returnValue += "{FASTER}IP address " + split[1] + " does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
-            } else if (text.startsWith("vul")) {
+            } else if (vulnerabilityModule && text.startsWith("vul")) {
                 String[] split = text.split("\\s");
                 if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
                     returnValue += "{FASTER}Incorrect paramaters for vul command. Type \"help\" and press enter to list available commands.";
@@ -1074,11 +1074,11 @@ public class GameScreen implements Screen {
     }
     
     private static class Server {
-        String address;
-        String user;
-        String password;
-        Array<String> filePaths;
-        Array<String> fileContents;
+        private String address;
+        private String user;
+        private String password;
+        private Array<String> filePaths;
+        private Array<String> fileContents;
         
         public Server() {
             address = MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255);
@@ -1093,6 +1093,17 @@ public class GameScreen implements Screen {
             Array<String> allPaths = new Array<String>(Core.instance.userFilePaths);
             Array<String> allContents = new Array<String>(Core.instance.userFileContents);
             
+            for (int i = 0; i < 5; i++) {
+                int index = MathUtils.random(allPaths.size - 1);
+                filePaths.add(allPaths.get(index));
+                fileContents.add(allContents.get(index));
+                allPaths.removeIndex(index);
+                allContents.removeIndex(index);
+            }
+    
+            allPaths = new Array<String>(Core.instance.userRewardPaths);
+            allContents = new Array<String>(Core.instance.userRewardContents);
+    
             for (int i = 0; i < 5; i++) {
                 int index = MathUtils.random(allPaths.size - 1);
                 filePaths.add(allPaths.get(index));
