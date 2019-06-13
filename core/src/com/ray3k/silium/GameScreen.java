@@ -12,10 +12,15 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rafaskoberg.gdx.typinglabel.TypingAdapter;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
+import jdk.nashorn.internal.ir.IfNode;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
 
 public class GameScreen implements Screen {
     private Stage stage;
@@ -48,12 +53,12 @@ public class GameScreen implements Screen {
         servers = new Array<Server>();
         refreshServers();
         
-        tty1Path = "/> ";
+        tty1Path = "";
         tty1Messages = new Array<String>();
         tty1Messages.add("{FASTER}Type \"help\" and press enter to list available commands.");
         tty1Mode = TtyMode.NETWORK;
         
-        tty2Path = "/> ";
+        tty2Path = "";
         tty2Messages = new Array<String>();
         tty2Messages.add("{FASTER}Type \"help\" and press enter to list available commands.");
         tty2Mode = TtyMode.DISABLED;
@@ -280,7 +285,8 @@ public class GameScreen implements Screen {
         if (tab != Tab.TTY1) subTable.setColor(1, 1, 1, 0);
     
         subTable.defaults().padTop(5);
-        Label label = new Label(tty1Path, skin);
+        Label label = new Label("/" + tty1Path + ">", skin);
+        label.setName("tty1-path-label");
         subTable.add(label).expandY().top();
     
         final TextField textField = new TextField("", skin);
@@ -500,21 +506,97 @@ public class GameScreen implements Screen {
                 returnValue += "exit {COLOR=#FFFFFFAA}disconnect from system{CLEARCOLOR}\n";
                 returnValue += "Press tab to autocomplete filenames";
             } else if (text.equalsIgnoreCase("clear")) {
-            
+                if (tab == tab.TTY1) {
+                    tty1Messages.clear();
+                    createTTY1();
+                }
             } else if (text.equalsIgnoreCase("ls")) {
-    
-            } else if (text.startsWith("cd")) {
-    
+                Array<String> paths = new Array<String>(connectedServer.filePaths);
+                Iterator<String> iter = paths.iterator();
+                while(iter.hasNext()) {
+                    String path = iter.next();
+                    if (!path.startsWith(tty1Path)) {
+                        iter.remove();
+                    }
+                }
+                
+                for (int i = 0; i < paths.size; i++) {
+                    String path = paths.get(i);
+                    paths.set(i, path.substring(tty1Path.length()).replaceAll("\\/.*","/"));
+                }
+
+                Array<String> noDupes = new Array<String>();
+                for (String path : paths) {
+                    if (!noDupes.contains(path,false)) {
+                        noDupes.add(path);
+                    }
+                }
+                paths = noDupes;
+                paths.sort();
+                
+                for (String path : paths) {
+                    returnValue += "{FASTER}" + path + "\n";
+                }
+            } else if (text.startsWith("cd ")) {
+                String[] split = text.split("\\s");
+                if (split.length == 2) {
+                    split[1] = split[1].replaceAll("\\/","");
+                    
+                    boolean foundDirectory = false;
+                    for (String possibleDirectory : connectedServer.filePaths) {
+                        if (possibleDirectory.replaceAll("(?!.*\\/).*$","").startsWith(tty1Path + split[1] + "/")) {
+                            tty1Path += split[1] + "/";
+                            Label label = root.findActor("tty1-path-label");
+                            label.setText("/" + tty1Path + ">");
+                            foundDirectory = true;
+                            break;
+                        }
+                    }
+                    
+                    if (!foundDirectory) {
+                        returnValue += "{FASTER}Directory does not exist. Type \"help\" and press enter to list available commands.";
+                    }
+                } else {
+                    returnValue += "{FASTER}Incorrect parameters for cd command. Type \"help\" and press enter to list available commands.";
+                }
             } else if (text.equalsIgnoreCase("cd..")) {
-    
+                tty1Path = tty1Path.replaceAll("\\/$","").replaceAll("(?!.*\\/).*","");
+                Label label = root.findActor("tty1-path-label");
+                label.setText("/" + tty1Path + ">");
             } else if (text.startsWith("read")) {
-    
+                String[] split = text.split("\\s");
+                if (split.length == 2) {
+                    int index = connectedServer.filePaths.indexOf(tty1Path + split[1], false);
+                    if (index != -1) {
+                        returnValue += connectedServer.fileContents.get(index);
+                    } else {
+                        returnValue += "{FASTER}Could not find file. Type \"help\" and press enter to list available commands.";
+                    }
+                } else {
+                    returnValue += "{FASTER}Incorrect paramaters for del command. Type \"help\" and press enter to list available commands.";
+                }
             } else if (text.startsWith("del")) {
-    
+                String[] split = text.split("\\s");
+                if (split.length == 2) {
+                    int index = connectedServer.filePaths.indexOf(tty1Path + split[1], false);
+                    if (index != -1) {
+                        connectedServer.filePaths.removeIndex(index);
+                        returnValue += "{FASTER}Deleted file " + split[1];
+                    } else {
+                        returnValue += "{FASTER}Could not find file. Type \"help\" and press enter to list available commands.";
+                    }
+                } else {
+                    returnValue += "{FASTER}Incorrect paramaters for del command. Type \"help\" and press enter to list available commands.";
+                }
             } else if (text.equalsIgnoreCase("exit")) {
                 returnValue += "Disconnected from server";
+                tty1Path = "";
+                Label label = root.findActor("tty1-path-label");
+                label.setText(tty1Path);
+                tty1Mode = TtyMode.NETWORK;
             }
         } else {
+            returnValue += "{FASTER}Error: Terminal not Responding";
         }
         
         return returnValue;
@@ -752,11 +834,29 @@ public class GameScreen implements Screen {
         String address;
         String user;
         String password;
+        Array<String> filePaths;
+        Array<String> fileContents;
         
         public Server() {
             address = MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255);
             user = Core.instance.users.random();
             password = Core.instance.passwords.random();
+            filePaths = new Array<String>();
+            fileContents = new Array<String>();
+            populateFiles();
+        }
+        
+        public void populateFiles() {
+            Array<String> allPaths = new Array<String>(Core.instance.userFilePaths);
+            Array<String> allContents = new Array<String>(Core.instance.userFileContents);
+            
+            for (int i = 0; i < 5; i++) {
+                int index = MathUtils.random(allPaths.size - 1);
+                filePaths.add(allPaths.get(index));
+                fileContents.add(allContents.get(index));
+                allPaths.removeIndex(index);
+                allContents.removeIndex(index);
+            }
         }
     }
     

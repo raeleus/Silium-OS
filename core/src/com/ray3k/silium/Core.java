@@ -7,13 +7,25 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.SkeletonRenderer;
+
+import javax.jnlp.FileContents;
 
 public class Core extends Game {
     public Array<String> users;
     public Array<String> passwords;
     public Array<String> vulnerabilities;
+    public Array<String> userFilePaths;
+    public Array<String> userFileContents;
+    public Array<String> cultistFilePaths;
+    public Array<String> cultistFileContents;
+    public Array<String> userRewardPaths;
+    public Array<String> userRewardContents;
+    public Array<String> cultistRewardPaths;
+    public Array<String> cultistRewardContents;
     public static Core instance;
     public SkeletonRenderer skeletonRenderer;
     public AssetManager assetManager;
@@ -32,13 +44,47 @@ public class Core extends Game {
         
         addAssets();
         
-        setScreen(new IntroScreen());
+        setScreen(new GameScreen());
     }
     
     private void addAssets() {
         users = new Array<String>(Gdx.files.internal("data/users.txt").readString().replaceAll("\\r", "").split("\\n"));
         passwords = new Array<String>(Gdx.files.internal("data/passwords.txt").readString().replaceAll("\\r", "").split("\\n"));
         vulnerabilities = new Array<String>(Gdx.files.internal("data/vulnerabilities.txt").readString().replaceAll("\\r", "").split("\\n"));
+    
+        JsonReader jsonReader = new JsonReader();
+        
+        JsonValue json = jsonReader.parse(Gdx.files.internal("data/user-files.json"));
+        userFilePaths = new Array<String>();
+        userFileContents = new Array<String>();
+        for (JsonValue child : json.iterator()) {
+            userFilePaths.add(child.name);
+            userFileContents.add(child.asString());
+        }
+    
+//        json = jsonReader.parse(Gdx.files.internal("data/user-rewards.json"));
+//        userRewardPaths = new Array<String>();
+//        userRewardContents = new Array<String>();
+//        for (JsonValue child : json.iterator()) {
+//            userRewardPaths.add(child.name);
+//            userRewardContents.add(child.asString());
+//        }
+//
+//        json = jsonReader.parse(Gdx.files.internal("data/cultist-files.json"));
+//        cultistFilePaths = new Array<String>();
+//        cultistFileContents = new Array<String>();
+//        for (JsonValue child : json.iterator()) {
+//            cultistFilePaths.add(child.name);
+//            cultistFileContents.add(child.asString());
+//        }
+//
+//        json = jsonReader.parse(Gdx.files.internal("data/cultist-rewards.json"));
+//        cultistRewardPaths = new Array<String>();
+//        cultistRewardContents = new Array<String>();
+//        for (JsonValue child : json.iterator()) {
+//            cultistRewardPaths.add(child.name);
+//            cultistRewardContents.add(child.asString());
+//        }
         
         assetManager = new AssetManager(new InternalFileHandleResolver());
         assetManager.load("ui/silium-ui.json", Skin.class);
