@@ -328,8 +328,18 @@ public class GameScreen implements Screen {
                     keyFilter.acceptSpace = false;
                     textField.setCursorPosition(position + 1);
                     return true;
+                } else if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
+                    keyFilter.acceptSpace = true;
                 }
                 return super.keyDown(event, keycode);
+            }
+    
+            @Override
+            public boolean keyUp(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
+                    keyFilter.acceptSpace = false;
+                }
+                return super.keyUp(event, keycode);
             }
         });
     
@@ -592,7 +602,7 @@ public class GameScreen implements Screen {
                 returnValue += "Disconnected from server";
                 tty1Path = "";
                 Label label = root.findActor("tty1-path-label");
-                label.setText(tty1Path);
+                label.setText("/" + tty1Path + ">");
                 tty1Mode = TtyMode.NETWORK;
             }
         } else {

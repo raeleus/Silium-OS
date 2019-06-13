@@ -12,8 +12,6 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.esotericsoftware.spine.SkeletonData;
 import com.esotericsoftware.spine.SkeletonRenderer;
 
-import javax.jnlp.FileContents;
-
 public class Core extends Game {
     public Array<String> users;
     public Array<String> passwords;
