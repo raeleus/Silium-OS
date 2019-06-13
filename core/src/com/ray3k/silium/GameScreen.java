@@ -420,6 +420,9 @@ public class GameScreen implements Screen {
                 for (Server server : servers) {
                     returnValue += "\n" + server.address;
                 }
+                
+                returnValue += "\n192.168.1.255 (BLACK WEB)";
+                returnValue += "\n192.168.1.100 (NETWORK OPERATIONS COMMAND)";
             } else if (text.startsWith("brt")) {
                 String[] split = text.split("\\s");
                 if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
@@ -439,7 +442,7 @@ public class GameScreen implements Screen {
                             animateBruteForce(matchedServer);
                         }
                     } else {
-                        returnValue += "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
+                        returnValue += "{FASTER}IP address " + split[1] + " does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
             } else if (text.startsWith("vul")) {
@@ -461,9 +464,14 @@ public class GameScreen implements Screen {
                             animateVulnerability(matchedServer);
                         }
                     } else {
-                        returnValue += "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
+                        returnValue += "{FASTER}IP address " + split[1] + " does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
+            } else if (text.equalsIgnoreCase("ssh 192.168.1.100")) {
+            
+            } else if (text.equalsIgnoreCase("ssh 192.168.1.255 l337h4ck3r changeme")) {
+                tty1Mode = TtyMode.BLACK_WEB;
+                returnValue += "{FASTER}Successfully logged into the Black Web:\nWe specialize in the untraceable purchase of Kreddit Card numbers.\nWe guarantee complete anonymity.\nType the account number below or \"exit\" to quit";
             } else if (text.startsWith("ssh")) {
                 String[] split = text.split("\\s");
                 if (split.length != 4 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
@@ -503,7 +511,7 @@ public class GameScreen implements Screen {
                             returnValue += "{FASTER}Username or password is incorrect. Type \"help\" and press enter to list available commands.";
                         }
                     } else {
-                        returnValue += "{FASTER}IP address " + split[1] + "does not exist. Type \"help\" and press enter to list available commands.";
+                        returnValue += "{FASTER}IP address " + split[1] + " does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
             } else if (text.equalsIgnoreCase("swordfish")) {
@@ -642,7 +650,24 @@ public class GameScreen implements Screen {
                 if (!connectedServer.filePaths.contains("log.txt",false) && tutorialLevel < 12) {
                     Core.instance.playVoice(12);
                     tutorialLevel = 12;
+                    
+                    TextArea textArea = root.findActor("notes-area");
+                    textArea.setText(textArea.getText() + "\nBlack Web User: l337h4ck3r\nPassword: changeme");
                 }
+            }
+        } else if (ttyMode == TtyMode.BLACK_WEB) {
+            if (text.equalsIgnoreCase("help")) {
+                returnValue += "{FASTER}Type the account number below or \"exit\" to quit\n";
+            } else if (text.equalsIgnoreCase("exit")) {
+                returnValue += "Disconnected from server";
+                tty1Path = "";
+                Label label = root.findActor("tty1-path-label");
+                label.setText("/" + tty1Path + ">");
+                tty1Mode = TtyMode.NETWORK;
+            } else if (text.matches("\\d{16}")) {
+                returnValue += "{FASTER}Kreddits have been added to your account.";
+            } else {
+                returnValue += "{FASTER}Incorrect value. Kreddit card numbers are 16 digits long";
             }
         } else {
             returnValue += "{FASTER}Error: Terminal not Responding";
@@ -676,6 +701,9 @@ public class GameScreen implements Screen {
                                 if (tutorialLevel < 12) {
                                     Core.instance.playVoice(12);
                                     tutorialLevel = 12;
+    
+                                    TextArea textArea = root.findActor("notes-area");
+                                    textArea.setText(textArea.getText() + "\nBlack Web User: l337h4ck3r\nPassword: changeme");
                                 }
                                 return true;
                             }
