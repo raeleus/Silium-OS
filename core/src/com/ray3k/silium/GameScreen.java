@@ -44,9 +44,21 @@ public class GameScreen implements Screen {
     private Array<Server> servers;
     private Server connectedServer;
     private int tutorialLevel;
+    private int proxies;
+    private int kreddits;
+    private int firewalls;
+    private int dataPoints;
+    private int memories;
+    private boolean vulnerabilityModule;
     
     @Override
     public void show() {
+        proxies = 1;
+        kreddits = 0;
+        firewalls = 2;
+        dataPoints = 0;
+        memories = 0;
+        
         tutorialLevel = 0;
         servers = new Array<Server>();
         refreshServers();
@@ -126,7 +138,8 @@ public class GameScreen implements Screen {
         image.setColor(skin.getColor("ui"));
         subTable.add(image);
         
-        Label label = new Label("$300",skin);
+        Label label = new Label("$" + kreddits, skin);
+        label.setName("label-kreddits");
         subTable.add(label);
     
         image = new Image(skin,"icon-data-points");
@@ -134,19 +147,22 @@ public class GameScreen implements Screen {
         image.setColor(skin.getColor("ui"));
         subTable.add(image).spaceLeft(10);
     
-        label = new Label("X5",skin);
+        label = new Label("X" + dataPoints, skin);
+        label.setName("label-data-points");
         subTable.add(label);
     
         image = new Image(skin,"icon-firewall-tinted");
         subTable.add(image).spaceLeft(10);
     
-        label = new Label("X5",skin);
+        label = new Label("X" + firewalls, skin);
+        label.setName("label-firewall");
         subTable.add(label);
     
         image = new Image(skin,"icon-proxy-tinted");
         subTable.add(image).spaceLeft(10);
     
-        label = new Label("X5",skin);
+        label = new Label("X" + proxies, skin);
+        label.setName("label-proxy");
         subTable.add(label);
         
         table.row();
@@ -403,8 +419,8 @@ public class GameScreen implements Screen {
                 returnValue += "brt <ip address> {COLOR=#FFFFFFAA}Initiate a brute force password hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}\n";
+                returnValue += "store {COLOR=#FFFFFFAA}Lists available upgrades for purchase with Kreddits{CLEARCOLOR}\n";
                 returnValue += "upgrade {COLOR=#FFFFFFAA}Upgrade Uni Ver to version 2.0{CLEARCOLOR}\n";
-                returnValue += "logoff -u {COLOR=#FFFFFFAA}Shutdown Uni Ver{CLEARCOLOR}";
             } else if (text.equalsIgnoreCase("clear")) {
                 if (tab == tab.TTY1) {
                     tty1Messages.clear();
@@ -422,7 +438,6 @@ public class GameScreen implements Screen {
                 }
                 
                 returnValue += "\n192.168.1.255 (BLACK WEB)";
-                returnValue += "\n192.168.1.100 (NETWORK OPERATIONS COMMAND)";
             } else if (text.startsWith("brt")) {
                 String[] split = text.split("\\s");
                 if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
@@ -467,8 +482,48 @@ public class GameScreen implements Screen {
                         returnValue += "{FASTER}IP address " + split[1] + " does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
-            } else if (text.equalsIgnoreCase("ssh 192.168.1.100")) {
-            
+            } else if (text.equalsIgnoreCase("store")) {
+                returnValue += "{FASTER}Equipment available for purchase:\n";
+                returnValue += "buy proxy {COLOR=#FFFFFFAA}$1,000 A proxy server that increases the time it takes for you to be detected on a system{CLEARCOLOR}\n";
+                returnValue += "buy firewall {COLOR=#FFFFFFAA}$20,000 A firewall system that prevents detection upon system breach{CLEARCOLOR}\n";
+                returnValue += "buy memory {COLOR=#FFFFFFAA}$100 A memory upgrade that increases speed of brute force hack.{CLEARCOLOR}\n";
+                if(!vulnerabilityModule) returnValue += "buy vul {COLOR=#FFFFFFAA}$50,000 Installs a vulnerability module effective against insecure systems.{CLEARCOLOR}\n";
+            } else if (text.equalsIgnoreCase("buy proxy")) {
+                if (kreddits >= 1000) {
+                    returnValue += "{FASTER}Purchase successful.";
+                    proxies++;
+                    kreddits -= 1000;
+                    updateCounterUI();
+                } else {
+                    returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
+                }
+            } else if (text.equalsIgnoreCase("buy firewall")) {
+                if (kreddits >= 20000) {
+                    returnValue += "{FASTER}Purchase successful.";
+                    firewalls++;
+                    kreddits -= 20000;
+                    updateCounterUI();
+                } else {
+                    returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
+                }
+            } else if (text.equalsIgnoreCase("buy memory")) {
+                if (kreddits >= 100) {
+                    returnValue += "{FASTER}Purchase successful.";
+                    memories++;
+                    kreddits -= 100;
+                    updateCounterUI();
+                } else {
+                    returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
+                }
+            } else if (!vulnerabilityModule && text.equalsIgnoreCase("buy vul")) {
+                if (kreddits >= 50000) {
+                    returnValue += "{FASTER}Purchase successful.";
+                    vulnerabilityModule = true;
+                    kreddits -= 50000;
+                    updateCounterUI();
+                } else {
+                    returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
+                }
             } else if (text.equalsIgnoreCase("ssh 192.168.1.255 l337h4ck3r changeme")) {
                 tty1Mode = TtyMode.BLACK_WEB;
                 returnValue += "{FASTER}Successfully logged into the Black Web:\nWe specialize in the untraceable purchase of Kreddit Card numbers.\nWe guarantee complete anonymity.\nType the account number below or \"exit\" to quit";
@@ -519,9 +574,6 @@ public class GameScreen implements Screen {
             }  else if (text.equalsIgnoreCase("upgrade")) {
                 returnValue += "{FASTER}Upgrade installing, please wait...\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............";
                 changeScreen(new GameOverAScreen(), 5);
-            }  else if (text.equalsIgnoreCase("logoff -u")) {
-                returnValue += "{FASTER}Shutting down, please wait...\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............";
-                changeScreen(new GameOverBScreen(), 5);
             }
             
             else {
@@ -646,6 +698,7 @@ public class GameScreen implements Screen {
                 Label label = root.findActor("tty1-path-label");
                 label.setText("/" + tty1Path + ">");
                 tty1Mode = TtyMode.NETWORK;
+                refreshServers();
                 
                 if (!connectedServer.filePaths.contains("log.txt",false) && tutorialLevel < 12) {
                     Core.instance.playVoice(12);
@@ -681,7 +734,14 @@ public class GameScreen implements Screen {
             @Override
             public boolean act(float delta) {
                 if (tty1Mode == TtyMode.SERVER || connectedServer.filePaths.contains("log.txt",false)) {
-                    Core.instance.playVoice(11);
+                    
+                    firewalls--;
+                    updateCounterUI();
+                    if (firewalls < 0) {
+                        changeScreen(new GameOverBScreen());
+                    } else {
+                        Core.instance.playVoice(11);
+                    }
                     
                     if (tty1Mode == TtyMode.SERVER) {
                         tty1Path = "";
@@ -694,6 +754,18 @@ public class GameScreen implements Screen {
                         for (Actor actor : subTable.getChildren()) {
                             ((TypingLabel) actor).skipToTheEnd();
                         }
+    
+                        subTable.row();
+                        TypingLabel typingLabel = new TypingLabel(tty1Messages.get(tty1Messages.size - 1), skin);
+                        typingLabel.setWrap(true);
+                        subTable.add(typingLabel).growX();
+                        
+                        refreshServers();
+    
+                        ScrollPane scrollPane = root.findActor("tty1-message-scroll");
+                        scrollPane.layout();
+                        scrollPane.layout();
+                        scrollPane.setScrollPercentY(1);
     
                         stage.addAction(Actions.delay(12, new Action() {
                             @Override
@@ -713,6 +785,36 @@ public class GameScreen implements Screen {
                 return true;
             }
         }));
+    }
+    
+    public void updateCounterUI() {
+        Label label = root.findActor("label-kreddits");
+        String originalValue = label.getText().toString();
+        label.setText("$" + kreddits);
+        if (!label.getText().equals(originalValue)) {
+            label.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
+        }
+    
+        label = root.findActor("label-data-points");
+        originalValue = label.getText().toString();
+        label.setText("$" + dataPoints);
+        if (!label.getText().equals(originalValue)) {
+            label.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
+        }
+    
+        label = root.findActor("label-firewall");
+        originalValue = label.getText().toString();
+        label.setText("X" + firewalls);
+        if (!label.getText().equals(originalValue)) {
+            label.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
+        }
+    
+        label = root.findActor("label-proxy");
+        originalValue = label.getText().toString();
+        label.setText("$" + proxies);
+        if (!label.getText().equals(originalValue)) {
+            label.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
+        }
     }
     
     private String autoComplete(TtyMode ttyMode, String text) {
