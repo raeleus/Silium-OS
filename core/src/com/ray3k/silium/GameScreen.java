@@ -131,15 +131,17 @@ public class GameScreen implements Screen {
         bottom.add(table).growY().width(300);
         
         Table subTable = new Table();
-        table.add(subTable);
+        table.add(subTable).growX();
         
+        subTable.defaults().expandX();
         Image image = new Image(skin,"icon-kreddits");
         image.setName("icon-kreddits");
         image.setColor(skin.getColor("ui"));
         subTable.add(image);
         
-        Label label = new Label("$" + kreddits, skin);
+        Label label = new Label("$" + kreddits, skin, "white");
         label.setName("label-kreddits");
+        label.setColor(skin.getColor("ui"));
         subTable.add(label);
     
         image = new Image(skin,"icon-data-points");
@@ -147,22 +149,29 @@ public class GameScreen implements Screen {
         image.setColor(skin.getColor("ui"));
         subTable.add(image).spaceLeft(10);
     
-        label = new Label("X" + dataPoints, skin);
+        label = new Label("X" + dataPoints, skin, "white");
         label.setName("label-data-points");
+        label.setColor(skin.getColor("ui"));
         subTable.add(label);
     
-        image = new Image(skin,"icon-firewall-tinted");
+        image = new Image(skin,"icon-firewall");
+        image.setName("icon-firewall");
+        image.setColor(skin.getColor("ui"));
         subTable.add(image).spaceLeft(10);
     
-        label = new Label("X" + firewalls, skin);
+        label = new Label("X" + firewalls, skin, "white");
         label.setName("label-firewall");
+        label.setColor(skin.getColor("ui"));
         subTable.add(label);
     
-        image = new Image(skin,"icon-proxy-tinted");
+        image = new Image(skin,"icon-proxy");
+        image.setName("icon-proxy");
+        image.setColor(skin.getColor("ui"));
         subTable.add(image).spaceLeft(10);
     
-        label = new Label("X" + proxies, skin);
+        label = new Label("X" + proxies, skin, "white");
         label.setName("label-proxy");
+        label.setColor(skin.getColor("ui"));
         subTable.add(label);
         
         table.row();
@@ -565,6 +574,8 @@ public class GameScreen implements Screen {
                 if (dataPoints > 0) {
                     dataPoints--;
                     upgrades++;
+                    updateCounterUI();
+                    
                     switch (upgrades) {
                         case 1:
                             Core.instance.playVoice(16);
@@ -813,29 +824,37 @@ public class GameScreen implements Screen {
         Label label = root.findActor("label-kreddits");
         String originalValue = label.getText().toString();
         label.setText("$" + kreddits);
-        if (!label.getText().equals(originalValue)) {
+        if (!label.getText().toString().equals(originalValue)) {
             label.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
+            Image image = root.findActor("icon-kreddits");
+            image.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
         }
     
         label = root.findActor("label-data-points");
         originalValue = label.getText().toString();
-        label.setText("$" + dataPoints);
-        if (!label.getText().equals(originalValue)) {
+        label.setText("X" + dataPoints);
+        if (!label.getText().toString().equals(originalValue)) {
             label.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
+            Image image = root.findActor("icon-data-points");
+            image.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
         }
     
         label = root.findActor("label-firewall");
         originalValue = label.getText().toString();
         label.setText("X" + firewalls);
-        if (!label.getText().equals(originalValue)) {
+        if (!label.getText().toString().equals(originalValue)) {
             label.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
+            Image image = root.findActor("icon-firewall");
+            image.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
         }
     
         label = root.findActor("label-proxy");
         originalValue = label.getText().toString();
-        label.setText("$" + proxies);
-        if (!label.getText().equals(originalValue)) {
+        label.setText("X" + proxies);
+        if (!label.getText().toString().equals(originalValue)) {
             label.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
+            Image image = root.findActor("icon-proxy");
+            image.addAction(Actions.sequence(Actions.color(skin.getColor("red"), .25f), Actions.delay(2), Actions.color(skin.getColor("ui"), .25f)));
         }
     }
     

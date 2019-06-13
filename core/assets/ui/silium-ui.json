@@ -277,6 +277,9 @@
 	"button-red": {
 		"font": "font-button",
 		"fontColor": "red"
+	},
+	"white": {
+		"font": "font"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {
