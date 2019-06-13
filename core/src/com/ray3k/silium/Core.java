@@ -60,13 +60,13 @@ public class Core extends Game {
             userFileContents.add(child.asString());
         }
     
-//        json = jsonReader.parse(Gdx.files.internal("data/user-rewards.json"));
-//        userRewardPaths = new Array<String>();
-//        userRewardContents = new Array<String>();
-//        for (JsonValue child : json.iterator()) {
-//            userRewardPaths.add(child.name);
-//            userRewardContents.add(child.asString());
-//        }
+        json = jsonReader.parse(Gdx.files.internal("data/user-rewards.json"));
+        userRewardPaths = new Array<String>();
+        userRewardContents = new Array<String>();
+        for (JsonValue child : json.iterator()) {
+            userRewardPaths.add(child.name);
+            userRewardContents.add(child.asString());
+        }
 //
 //        json = jsonReader.parse(Gdx.files.internal("data/cultist-files.json"));
 //        cultistFilePaths = new Array<String>();
