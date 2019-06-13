@@ -16,11 +16,6 @@ import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rafaskoberg.gdx.typinglabel.TypingAdapter;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
-import jdk.nashorn.internal.ir.IfNode;
-import sun.rmi.runtime.Log;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 
 public class GameScreen implements Screen {
@@ -48,9 +43,11 @@ public class GameScreen implements Screen {
     ButtonGroup<TextButton> tabButtonGroup;
     private Array<Server> servers;
     private Server connectedServer;
+    private int tutorialLevel;
     
     @Override
     public void show() {
+        tutorialLevel = 0;
         servers = new Array<Server>();
         refreshServers();
         
@@ -414,6 +411,11 @@ public class GameScreen implements Screen {
                     createTTY1();
                 }
             } else if (text.equalsIgnoreCase("nmap")) {
+                if (tutorialLevel < 6) {
+                    Core.instance.playVoice(6);
+                    tutorialLevel = 6;
+                }
+                
                 returnValue += "{FASTER}Network Map:";
                 for (Server server : servers) {
                     returnValue += "\n" + server.address;
@@ -481,7 +483,11 @@ public class GameScreen implements Screen {
                                 tty1Mode = TtyMode.SERVER;
                                 connectedServer = matchedServer;
                                 returnValue = "{FASTER}Connected to " + matchedServer.address + ". Welcome " + matchedServer.user + "!";
-                                Core.instance.playVoice(8);
+    
+                                if (tutorialLevel < 8) {
+                                    Core.instance.playVoice(8);
+                                    tutorialLevel = 8;
+                                }
                             }
                         } else {
                             returnValue += "{FASTER}Username or password is incorrect. Type \"help\" and press enter to list available commands.";
@@ -522,6 +528,10 @@ public class GameScreen implements Screen {
                     createTTY1();
                 }
             } else if (text.equalsIgnoreCase("ls")) {
+                if (tutorialLevel < 9) {
+                    Core.instance.playVoice(9);
+                    tutorialLevel = 9;
+                }
                 Array<String> paths = new Array<String>(connectedServer.filePaths);
                 Iterator<String> iter = paths.iterator();
                 while(iter.hasNext()) {
@@ -684,8 +694,11 @@ public class GameScreen implements Screen {
                     scrollPane.layout();
                     scrollPane.setScrollPercentY(1);
                     tty1Mode = TtyMode.NETWORK;
-                    
-                    Core.instance.playVoice(7);
+    
+                    if (tutorialLevel < 7) {
+                        Core.instance.playVoice(7);
+                        tutorialLevel = 7;
+                    }
                     return true;
                 }
             });
@@ -739,7 +752,10 @@ public class GameScreen implements Screen {
                     scrollPane.setScrollPercentY(1);
                     tty1Mode = TtyMode.NETWORK;
     
-                    Core.instance.playVoice(7);
+                    if (tutorialLevel < 7) {
+                        Core.instance.playVoice(7);
+                        tutorialLevel = 7;
+                    }
                     return true;
                 }
             });
