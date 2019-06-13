@@ -48,7 +48,7 @@ public class GameScreen implements Screen {
     private int kreddits;
     private int firewalls;
     private int dataPoints;
-    private int memories;
+    private int upgrades;
     private boolean vulnerabilityModule;
     
     @Override
@@ -56,8 +56,8 @@ public class GameScreen implements Screen {
         proxies = 1;
         kreddits = 0;
         firewalls = 2;
-        dataPoints = 0;
-        memories = 0;
+        dataPoints = 10;
+        upgrades = 0;
         
         tutorialLevel = 0;
         servers = new Array<Server>();
@@ -486,7 +486,6 @@ public class GameScreen implements Screen {
                 returnValue += "{FASTER}Equipment available for purchase:\n";
                 returnValue += "buy proxy {COLOR=#FFFFFFAA}$1,000 A proxy server that increases the time it takes for you to be detected on a system{CLEARCOLOR}\n";
                 returnValue += "buy firewall {COLOR=#FFFFFFAA}$20,000 A firewall system that prevents detection upon system breach{CLEARCOLOR}\n";
-                returnValue += "buy memory {COLOR=#FFFFFFAA}$100 A memory upgrade that increases speed of brute force hack.{CLEARCOLOR}\n";
                 if(!vulnerabilityModule) returnValue += "buy vul {COLOR=#FFFFFFAA}$50,000 Installs a vulnerability module effective against insecure systems.{CLEARCOLOR}\n";
             } else if (text.equalsIgnoreCase("buy proxy")) {
                 if (kreddits >= 1000) {
@@ -502,15 +501,6 @@ public class GameScreen implements Screen {
                     returnValue += "{FASTER}Purchase successful.";
                     firewalls++;
                     kreddits -= 20000;
-                    updateCounterUI();
-                } else {
-                    returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
-                }
-            } else if (text.equalsIgnoreCase("buy memory")) {
-                if (kreddits >= 100) {
-                    returnValue += "{FASTER}Purchase successful.";
-                    memories++;
-                    kreddits -= 100;
                     updateCounterUI();
                 } else {
                     returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
@@ -572,8 +562,40 @@ public class GameScreen implements Screen {
             } else if (text.equalsIgnoreCase("swordfish")) {
                 returnValue += "{FASTER}CLAUS: Ahh fooey! The connection dropped!\nSYSADMIN: WTH? Why am I still getting your messages?\nCLAUS: I'm transmitting through an intermediary right now, but the connection is {SHAKE}shakey!{ENDSHAKE}\nSYSADMIN: Alright, sign off and sign back on. It should be fixed now.\n{SLOW}{WAVE}USER HAS DISCONNECTED";
             }  else if (text.equalsIgnoreCase("upgrade")) {
-                returnValue += "{FASTER}Upgrade installing, please wait...\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............\n...............";
-                changeScreen(new GameOverAScreen(), 5);
+                if (dataPoints > 0) {
+                    dataPoints--;
+                    upgrades++;
+                    switch (upgrades) {
+                        case 1:
+                            Core.instance.playVoice(16);
+                            break;
+                        case 2:
+                            Core.instance.playVoice(17);
+                            break;
+                        case 3:
+                            Core.instance.playVoice(18);
+                            break;
+                        case 4:
+                            Core.instance.playVoice(19);
+                            break;
+                        case 5:
+                            Core.instance.playVoice(20);
+                            break;
+                        case 6:
+                            Core.instance.playVoice(21);
+                            break;
+                        case 7:
+                            Core.instance.playVoice(22);
+                            break;
+                        case 8:
+                            Core.instance.playVoice(23);
+                            changeScreen(new GameOverAScreen(), 5);
+                            break;
+                    }
+                    returnValue += "{FASTER}Upgrade installing, please wait...\n...............\n...............\n...............";
+                } else {
+                    returnValue += "{FASTER}Insufficient data points. Infect Cultist servers to collect data points";
+                }
             }
             
             else {
