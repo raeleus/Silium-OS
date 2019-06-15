@@ -15,6 +15,24 @@
        </body>
 
        <script>
+              window.onkeypress =
+              function(event) {
+                     // prevent the space key (page scroll down)
+                     if(event.keyCode == 32){
+                            event.preventDefault();
+                            return false;
+                     }
+              };
+
+              window.onkeydown =
+              function(event) {
+                     // prevent all navigation keys except the space key
+                     if([9, 33, 34, 35, 36, 37, 38, 39, 40, 112, 113, 114].indexOf(event.keyCode) > -1){
+                            event.preventDefault();
+                            return false;
+                     }
+              };
+
               document.getElementById('gameViewport').setAttribute('content',
                  'width=device-width initial-scale=' + 1/window.devicePixelRatio);
 
@@ -32,12 +50,5 @@
               }
               document.getElementById('embed-html').addEventListener('mousedown', handleMouseDown, false);
               document.getElementById('embed-html').addEventListener('mouseup', handleMouseUp, false);
-
-              window.addEventListener("keydown", function(e) {
-                     // prevent keys from triggering browser commands
-                     if([9, 112, 113, 114].indexOf(e.keyCode) > -1) {
-                            e.preventDefault();
-                     }
-              }, false);
        </script>
 </html>

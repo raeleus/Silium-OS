@@ -1206,7 +1206,7 @@ public class GameScreen implements Screen {
     
                 String contents = allContents.get(index);
                 while (contents.matches("(\\n|.)*<kreddit>(\\n|.)*")) {
-                    String kredditCard = String.format("%04d",MathUtils.random(9999))+ "-" + String.format("%04d",MathUtils.random(9999)) + "-" + String.format("%04d",MathUtils.random(9999)) + "-" + String.format("%04d",MathUtils.random(9999));
+                    String kredditCard = generateFourDigitCode() + "-" + generateFourDigitCode()  + "-" + generateFourDigitCode()  + "-" + generateFourDigitCode() ;
                     kredditCards.add(kredditCard.replaceAll("\\D*", ""));
                     contents = contents.replaceFirst("<kreddit>", kredditCard);
                 }
@@ -1224,6 +1224,15 @@ public class GameScreen implements Screen {
         public int compareTo(Server other) {
             return this.address.compareTo(other.address);
         }
+    }
+    
+    private static String generateFourDigitCode() {
+        int number = MathUtils.random(9999);
+        String returnValue = Integer.toString(number);
+        if (number < 1000) returnValue = "0" + returnValue;
+        if (number < 100) returnValue = "0" + returnValue;
+        if (number < 10) returnValue = "0" + returnValue;
+        return returnValue;
     }
     
     @Override
