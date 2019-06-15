@@ -1146,14 +1146,6 @@ public class GameScreen implements Screen {
                     contents = contents.replaceFirst("<kreddit>", kredditCard);
                 }
                 
-//                String[] lines = allContents.get(index).split("<kreddit>(?=\\n)?");
-//                String contents = "";
-//                for (int j = 0; j < lines.length - 1; j += 2) {
-//                    String kredditCard = String.format("%04d",MathUtils.random(9999))+ "-" + String.format("%04d",MathUtils.random(9999)) + "-" + String.format("%04d",MathUtils.random(9999)) + "-" + String.format("%04d",MathUtils.random(9999));
-//                    kredditCards.add(kredditCard.replaceAll("\\D*", ""));
-//                    contents += lines[j] + kredditCard + lines[j + 1];
-//                }
-                
                 fileContents.add(contents);
                 allPaths.removeIndex(index);
                 allContents.removeIndex(index);
