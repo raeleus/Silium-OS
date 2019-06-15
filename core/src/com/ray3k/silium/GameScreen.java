@@ -325,7 +325,9 @@ public class GameScreen implements Screen {
                     
                     textField.setText("");
                 } else if (keycode == Input.Keys.TAB) {
+                    keyFilter.acceptSpace = true;
                     textField.setText(autoComplete(tty1Mode, textField.getText()));
+                    keyFilter.acceptSpace = false;
                     textField.setCursorPosition(textField.getText().length());
                 } else if (keycode == Input.Keys.SPACE) {
                     int position = textField.getCursorPosition();
@@ -414,8 +416,8 @@ public class GameScreen implements Screen {
                 returnValue += "brt <ip address> {COLOR=#FFFFFFAA}Initiate a brute force password hack on the specified IP address{CLEARCOLOR}\n";
                 if (vulnerabilityModule) returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}\n";
-                returnValue += "store {COLOR=#FFFFFFAA}Lists available upgrades for purchase with Kreddits{CLEARCOLOR}\n";
-                returnValue += "upgrade {COLOR=#FFFFFFAA}Upgrade Uni Ver to version 2.0{CLEARCOLOR}\n";
+                if (tutorialLevel >= 15) returnValue += "store {COLOR=#FFFFFFAA}Lists available upgrades for purchase with Kreddits{CLEARCOLOR}\n";
+                if (tutorialLevel >= 15) returnValue += "upgrade {COLOR=#FFFFFFAA}Upgrade Uni Ver to version 2.0{CLEARCOLOR}\n";
             } else if (text.equalsIgnoreCase("clear")) {
                 if (tab == tab.TTY1) {
                     tty1Messages.clear();
@@ -478,12 +480,12 @@ public class GameScreen implements Screen {
                         returnValue += "{FASTER}IP address " + split[1] + " does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
-            } else if (text.equalsIgnoreCase("store")) {
+            } else if (tutorialLevel >= 15 && text.equalsIgnoreCase("store")) {
                 returnValue += "{FASTER}Equipment available for purchase:\n";
                 returnValue += "buy proxy {COLOR=#FFFFFFAA}$1,000 A proxy server that increases the time it takes for you to be detected on a system{CLEARCOLOR}\n";
                 returnValue += "buy firewall {COLOR=#FFFFFFAA}$20,000 A firewall system that prevents detection upon system breach{CLEARCOLOR}\n";
                 if(!vulnerabilityModule) returnValue += "buy vul {COLOR=#FFFFFFAA}$50,000 Installs a vulnerability module effective against insecure systems.{CLEARCOLOR}\n";
-            } else if (text.equalsIgnoreCase("buy proxy")) {
+            } else if (tutorialLevel >= 15 && text.equalsIgnoreCase("buy proxy")) {
                 if (kreddits >= 1000) {
                     returnValue += "{FASTER}Purchase successful.";
                     proxies++;
@@ -492,7 +494,7 @@ public class GameScreen implements Screen {
                 } else {
                     returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
                 }
-            } else if (text.equalsIgnoreCase("buy firewall")) {
+            } else if (tutorialLevel >= 15 && text.equalsIgnoreCase("buy firewall")) {
                 if (kreddits >= 20000) {
                     returnValue += "{FASTER}Purchase successful.";
                     firewalls++;
@@ -501,7 +503,7 @@ public class GameScreen implements Screen {
                 } else {
                     returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
                 }
-            } else if (!vulnerabilityModule && text.equalsIgnoreCase("buy vul")) {
+            } else if (tutorialLevel >= 15 && !vulnerabilityModule && text.equalsIgnoreCase("buy vul")) {
                 if (kreddits >= 50000) {
                     returnValue += "{FASTER}Purchase successful.";
                     vulnerabilityModule = true;
@@ -568,7 +570,7 @@ public class GameScreen implements Screen {
                 }
             } else if (text.equalsIgnoreCase("swordfish")) {
                 returnValue += "{FASTER}CLAUS: Ahh fooey! The connection dropped!\nSYSADMIN: WTH? Why am I still getting your messages?\nCLAUS: I'm transmitting through an intermediary right now, but the connection is {SHAKE}shakey!{ENDSHAKE}\nSYSADMIN: Alright, sign off and sign back on. It should be fixed now.\n{SLOW}{WAVE}USER HAS DISCONNECTED";
-            }  else if (text.equalsIgnoreCase("upgrade")) {
+            }  else if (tutorialLevel >= 15 && text.equalsIgnoreCase("upgrade")) {
                 if (dataPoints > 0) {
                     dataPoints--;
                     upgrades++;
@@ -808,7 +810,7 @@ public class GameScreen implements Screen {
     }
     
     private void initiateTrace() {
-        stage.addAction(Actions.delay(10, new Action() {
+        stage.addAction(Actions.delay(200, new Action() {
             final Server myServer = connectedServer;
             @Override
             public boolean act(float delta) {
@@ -917,16 +919,83 @@ public class GameScreen implements Screen {
             if (ttyMode == TtyMode.NETWORK) {
                 commands.add("help");
                 commands.add("clear");
+                commands.add("nmap");
                 commands.add("brt");
-                commands.add("vul");
+                for (Server server : servers) {
+                    commands.add("brt " + server.address);
+                }
+                if (vulnerabilityModule) {
+                    commands.add("vul");
+                    for (Server server : servers) {
+                        commands.add("vul " + server.address);
+                    }
+                }
                 commands.add("ssh");
+                for (Server server : servers) {
+                    commands.add("ssh " + server.address);
+                }
+                commands.add("ssh 192.168.1.255");
+                if (tutorialLevel >= 15) {
+                    commands.add("store");
+                    commands.add("buy");
+                    commands.add("buy proxy");
+                    commands.add("buy firewall");
+                    if (!vulnerabilityModule) {
+                        commands.add("buy vul");
+                    }
+                    commands.add("upgrade");
+                }
             } else if (ttyMode == TtyMode.SERVER) {
-    
-            } else {
+                commands.add("help");
+                commands.add("clear");
+                commands.add("ls");
+                
+                commands.add("cd");
+                Array<String> paths = new Array<String>(connectedServer.filePaths);
+                Iterator<String> iter = paths.iterator();
+                while(iter.hasNext()) {
+                    String path = iter.next();
+                    if (!path.startsWith(tty1Path)) {
+                        iter.remove();
+                    }
+                }
+                for (int i = 0; i < paths.size; i++) {
+                    String path = paths.get(i);
+                    paths.set(i, path.substring(tty1Path.length()).replaceAll("\\/.*","/"));
+                }
+                Array<String> noDupes = new Array<String>();
+                for (String path : paths) {
+                    if (!noDupes.contains(path,false)) {
+                        noDupes.add(path);
+                    }
+                }
+                paths = noDupes;
+                paths.sort();
+                for (String path : paths) {
+                    commands.add("cd " + path);
+                }
+                commands.add("cd..");
+                
+                commands.add("read");
+                commands.add("del");
+                for (String path : paths) {
+                    if (!path.endsWith("/")) {
+                        commands.add("read " + path);
+                        commands.add("del " + path);
+                    }
+                }
+                if (tutorialLevel >= 13 && !connectedServer.virused) {
+                    commands.add("deploy");
+                    commands.add("deploy virus.sh");
+                }
+                commands.add("exit");
+            } else if (ttyMode == TtyMode.BLACK_WEB) {
+                commands.add("help");
+                commands.add("exit");
             }
     
             for (String command : commands) {
-                if (command.toLowerCase().startsWith(text)) {
+                if (command.toLowerCase().startsWith(text.trim())) {
                     returnValue = command;
                     break;
                 }
