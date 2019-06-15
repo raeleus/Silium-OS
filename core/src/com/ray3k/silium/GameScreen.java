@@ -350,7 +350,10 @@ public class GameScreen implements Screen {
         });
     
         stage.setKeyboardFocus(root.findActor("tty1-field"));
-        stage.setScrollFocus(root.findActor("tty1-message-scroll"));
+        stage.setScrollFocus(scrollPane);
+        scrollPane.layout();
+        scrollPane.layout();
+        scrollPane.setScrollPercentY(1);
         tab = Tab.TTY1;
     }
     
@@ -1051,7 +1054,9 @@ public class GameScreen implements Screen {
         TextButton textButton = root.findActor("notes-button");
         textButton.setChecked(true);
         
-        stage.setKeyboardFocus(root.findActor("notes-area"));
+        TextArea textArea = root.findActor("notes-area");
+        stage.setKeyboardFocus(textArea);
+        textArea.setCursorPosition(textArea.getText().length());
         stage.setScrollFocus(null);
     }
     
