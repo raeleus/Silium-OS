@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.g3d.particles.values.LineSpawnShapeValue;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -40,7 +41,7 @@ public class GameScreen implements Screen {
     private TtyMode tty1Mode;
     private TtyMode tty2Mode;
     private Table root;
-    ButtonGroup<TextButton> tabButtonGroup;
+    private ButtonGroup<TextButton> tabButtonGroup;
     private Array<Server> servers;
     private Server connectedServer;
     private int tutorialLevel;
@@ -50,6 +51,7 @@ public class GameScreen implements Screen {
     private int dataPoints;
     private int upgrades;
     private boolean vulnerabilityModule;
+    private static Array<String> kredditCards;
     
     @Override
     public void show() {
@@ -58,6 +60,8 @@ public class GameScreen implements Screen {
         firewalls = 2;
         dataPoints = 10;
         upgrades = 0;
+        
+        kredditCards = new Array<String>();
         
         tutorialLevel = 0;
         servers = new Array<Server>();
@@ -133,7 +137,6 @@ public class GameScreen implements Screen {
         Table subTable = new Table();
         table.add(subTable).growX();
         
-        subTable.defaults().expandX();
         Image image = new Image(skin,"icon-kreddits");
         image.setName("icon-kreddits");
         image.setColor(skin.getColor("ui"));
@@ -142,7 +145,7 @@ public class GameScreen implements Screen {
         Label label = new Label("$" + kreddits, skin, "white");
         label.setName("label-kreddits");
         label.setColor(skin.getColor("ui"));
-        subTable.add(label);
+        subTable.add(label).expandX().left();
     
         image = new Image(skin,"icon-data-points");
         image.setName("icon-data-points");
@@ -152,7 +155,7 @@ public class GameScreen implements Screen {
         label = new Label("X" + dataPoints, skin, "white");
         label.setName("label-data-points");
         label.setColor(skin.getColor("ui"));
-        subTable.add(label);
+        subTable.add(label).expandX().left();
     
         image = new Image(skin,"icon-firewall");
         image.setName("icon-firewall");
@@ -162,7 +165,7 @@ public class GameScreen implements Screen {
         label = new Label("X" + firewalls, skin, "white");
         label.setName("label-firewall");
         label.setColor(skin.getColor("ui"));
-        subTable.add(label);
+        subTable.add(label).expandX().left();
     
         image = new Image(skin,"icon-proxy");
         image.setName("icon-proxy");
@@ -172,7 +175,7 @@ public class GameScreen implements Screen {
         label = new Label("X" + proxies, skin, "white");
         label.setName("label-proxy");
         label.setColor(skin.getColor("ui"));
-        subTable.add(label);
+        subTable.add(label).expandX().left();
         
         table.row();
         table.add().growY();
@@ -750,8 +753,17 @@ public class GameScreen implements Screen {
                 Label label = root.findActor("tty1-path-label");
                 label.setText("/" + tty1Path + ">");
                 tty1Mode = TtyMode.NETWORK;
-            } else if (text.matches("\\d{16}")) {
-                returnValue += "{FASTER}Kreddits have been added to your account.";
+            } else if (text.replaceAll("\\D*", "").matches("\\d{16}")) {
+                String kredditCard = text.replaceAll("\\D*", "");
+                int index = kredditCards.indexOf(kredditCard, false);
+                if (index != -1) {
+                    kredditCards.removeIndex(index);
+                    returnValue += "{FASTER}Kreddits have been added to your account.";
+                    kreddits += 100;
+                    updateCounterUI();
+                } else {
+                    returnValue += "{FASTER}That card doesn't work. Try again.";
+                }
             } else {
                 returnValue += "{FASTER}Incorrect value. Kreddit card numbers are 16 digits long";
             }
@@ -763,7 +775,7 @@ public class GameScreen implements Screen {
     }
     
     private void initiateTrace() {
-        stage.addAction(Actions.delay(20, new Action() {
+        stage.addAction(Actions.delay(200, new Action() {
             @Override
             public boolean act(float delta) {
                 if (tty1Mode == TtyMode.SERVER || connectedServer.filePaths.contains("log.txt",false)) {
@@ -1123,10 +1135,26 @@ public class GameScreen implements Screen {
             allPaths = new Array<String>(Core.instance.userRewardPaths);
             allContents = new Array<String>(Core.instance.userRewardContents);
     
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 70; i++) {
                 int index = MathUtils.random(allPaths.size - 1);
                 filePaths.add(allPaths.get(index));
-                fileContents.add(allContents.get(index));
+    
+                String contents = allContents.get(index);
+                while (contents.matches("(\\n|.)*<kreddit>(\\n|.)*")) {
+                    String kredditCard = String.format("%04d",MathUtils.random(9999))+ "-" + String.format("%04d",MathUtils.random(9999)) + "-" + String.format("%04d",MathUtils.random(9999)) + "-" + String.format("%04d",MathUtils.random(9999));
+                    kredditCards.add(kredditCard.replaceAll("\\D*", ""));
+                    contents = contents.replaceFirst("<kreddit>", kredditCard);
+                }
+                
+//                String[] lines = allContents.get(index).split("<kreddit>(?=\\n)?");
+//                String contents = "";
+//                for (int j = 0; j < lines.length - 1; j += 2) {
+//                    String kredditCard = String.format("%04d",MathUtils.random(9999))+ "-" + String.format("%04d",MathUtils.random(9999)) + "-" + String.format("%04d",MathUtils.random(9999)) + "-" + String.format("%04d",MathUtils.random(9999));
+//                    kredditCards.add(kredditCard.replaceAll("\\D*", ""));
+//                    contents += lines[j] + kredditCard + lines[j + 1];
+//                }
+                
+                fileContents.add(contents);
                 allPaths.removeIndex(index);
                 allContents.removeIndex(index);
             }
