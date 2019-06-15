@@ -447,6 +447,7 @@ public class GameScreen implements Screen {
                 returnValue += "{FASTER}Network Map:";
                 for (Server server : servers) {
                     returnValue += "\n" + server.address;
+                    if (server.cultist) returnValue += " (CULTIST)";
                 }
                 
                 returnValue += "\n192.168.1.255 (BLACK WEB)";
@@ -560,6 +561,9 @@ public class GameScreen implements Screen {
                                 if (tutorialLevel < 8) {
                                     Core.instance.playVoice(8);
                                     tutorialLevel = 8;
+                                } else if (tutorialLevel < 14 && matchedServer.cultist) {
+                                    Core.instance.playVoice(14);
+                                    tutorialLevel = 14;
                                 }
                                 
                                 if (tutorialLevel >= 10) {
@@ -760,6 +764,21 @@ public class GameScreen implements Screen {
             if (text.equalsIgnoreCase("help")) {
                 returnValue += "{FASTER}Type the account number below or \"exit\" to quit\n";
             } else if (text.equalsIgnoreCase("exit")) {
+                if (tab == tab.TTY1) {
+                    tty1Messages.clear();
+                    createTTY1();
+                }
+    
+                if (tutorialLevel < 13) {
+                    Core.instance.playVoice(13);
+                    tutorialLevel = 13;
+        
+                    TextArea textArea = root.findActor("notes-area");
+                    textArea.setText(textArea.getText() + "\nBlack Web User: l337h4ck3r\nPassword: changeme");
+                    
+                    refreshServers();
+                }
+                
                 returnValue += "Disconnected from server";
                 tty1Path = "";
                 Label label = root.findActor("tty1-path-label");
@@ -1111,9 +1130,20 @@ public class GameScreen implements Screen {
     
     public void refreshServers() {
         servers.clear();
+        
         for(int i = 0; i < 5; i++) {
-            servers.add(new Server());
+            servers.add(new Server(false));
         }
+        
+        if (tutorialLevel == 13) {
+            servers.add(new Server(true));
+        } else if (tutorialLevel > 13) {
+            if (MathUtils.randomBoolean(.5f)) {
+                servers.add(new Server(true));
+            }
+        }
+        
+        servers.sort();
     }
     
     private static class Server {
@@ -1122,8 +1152,10 @@ public class GameScreen implements Screen {
         private String password;
         private Array<String> filePaths;
         private Array<String> fileContents;
+        private boolean cultist;
         
-        public Server() {
+        public Server(boolean cultist) {
+            this.cultist = cultist;
             address = MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255);
             user = Core.instance.users.random();
             password = Core.instance.passwords.random();
@@ -1133,8 +1165,8 @@ public class GameScreen implements Screen {
         }
         
         public void populateFiles() {
-            Array<String> allPaths = new Array<String>(Core.instance.userFilePaths);
-            Array<String> allContents = new Array<String>(Core.instance.userFileContents);
+            Array<String> allPaths = new Array<String>(cultist ? Core.instance.userFilePaths : Core.instance.userFilePaths);
+            Array<String> allContents = new Array<String>(cultist ? Core.instance.userFileContents : Core.instance.userFileContents);
             
             for (int i = 0; i < 5; i++) {
                 int index = MathUtils.random(allPaths.size - 1);
@@ -1147,7 +1179,7 @@ public class GameScreen implements Screen {
             allPaths = new Array<String>(Core.instance.userRewardPaths);
             allContents = new Array<String>(Core.instance.userRewardContents);
     
-            for (int i = 0; i < 70; i++) {
+            for (int i = 0; i < 5; i++) {
                 int index = MathUtils.random(allPaths.size - 1);
                 filePaths.add(allPaths.get(index));
     
