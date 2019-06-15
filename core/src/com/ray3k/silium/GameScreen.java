@@ -49,7 +49,6 @@ public class GameScreen implements Screen {
     private int upgrades;
     private boolean vulnerabilityModule;
     private static Array<String> kredditCards;
-    private Action traceAction;
     
     @Override
     public void show() {
@@ -744,7 +743,6 @@ public class GameScreen implements Screen {
                 label.setText("/" + tty1Path + ">");
                 tty1Mode = TtyMode.NETWORK;
                 refreshServers();
-                stage.getRoot().removeAction(traceAction);
                 
                 if (!connectedServer.filePaths.contains("log.txt",false) && tutorialLevel < 12) {
                     Core.instance.playVoice(12);
@@ -807,10 +805,11 @@ public class GameScreen implements Screen {
     }
     
     private void initiateTrace() {
-        traceAction = Actions.delay(200, new Action() {
+        stage.addAction(Actions.delay(10, new Action() {
+            final Server myServer = connectedServer;
             @Override
             public boolean act(float delta) {
-                if (tty1Mode == TtyMode.SERVER || connectedServer.filePaths.contains("log.txt",false)) {
+                if (tty1Mode == TtyMode.SERVER && connectedServer == myServer || myServer.filePaths.contains("log.txt",false)) {
             
                     firewalls--;
                     updateCounterUI();
@@ -821,7 +820,7 @@ public class GameScreen implements Screen {
                     }
             
                     if (tty1Mode == TtyMode.SERVER) {
-                        if (tab == tab.TTY1) {
+                        if (tab == Tab.TTY1) {
                             tty1Messages.clear();
                             createTTY1();
                         }
@@ -866,8 +865,7 @@ public class GameScreen implements Screen {
                 }
                 return true;
             }
-        });
-        stage.addAction(traceAction);
+        }));
     }
     
     public void updateCounterUI() {
