@@ -535,10 +535,6 @@ public class GameScreen implements Screen {
                 tty1Mode = TtyMode.BLACK_WEB;
                 returnValue += "{FASTER}Successfully logged into the Black Web:\nWe specialize in the untraceable purchase of Kreddit Card numbers.\nWe guarantee complete anonymity.\nType the account number below or \"exit\" to quit";
             } else if (text.startsWith("ssh")) {
-                if (tab == tab.TTY1) {
-                    tty1Messages.clear();
-                    createTTY1();
-                }
                 String[] split = text.split("\\s");
                 if (split.length != 4 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
                     returnValue += "{FASTER}Incorrect paramaters for ssh command. Type \"help\" and press enter to list available commands.";
@@ -554,6 +550,10 @@ public class GameScreen implements Screen {
                     if (matchedServer != null) {
                         if (matchedServer.user.equals(split[2]) && matchedServer.password.equals(split[3])) {
                             if (tab == Tab.TTY1) {
+                                if (tab == tab.TTY1) {
+                                    tty1Messages.clear();
+                                    createTTY1();
+                                }
                                 tty1Mode = TtyMode.SERVER;
                                 connectedServer = matchedServer;
                                 returnValue = "{FASTER}Connected to " + matchedServer.address + ". Welcome " + matchedServer.user + "!";
@@ -638,12 +638,24 @@ public class GameScreen implements Screen {
                 returnValue += "cd.. {COLOR=#FFFFFFAA}return to parent folder{CLEARCOLOR}\n";
                 returnValue += "read <filename> {COLOR=#FFFFFFAA}read the contents of a file{CLEARCOLOR}\n";
                 returnValue += "del <filename> {COLOR=#FFFFFFAA}delete the specified file{CLEARCOLOR}\n";
+                if (tutorialLevel >= 13 && !connectedServer.virused) returnValue += "deploy virus.sh {COLOR=#FFFFFFAA}Installs a virus to disable the server and harvest data points{CLEARCOLOR}\n";
                 returnValue += "exit {COLOR=#FFFFFFAA}disconnect from system{CLEARCOLOR}\n";
                 returnValue += "Press tab to autocomplete filenames";
             } else if (text.equalsIgnoreCase("clear")) {
                 if (tab == tab.TTY1) {
                     tty1Messages.clear();
                     createTTY1();
+                }
+            } else if (tutorialLevel >= 13 && text.equalsIgnoreCase("deploy virus.sh")) {
+                if (!connectedServer.virused) {
+                    returnValue += "{FASTER}......\n.....\n.....\nVirus successfully installed.";
+                    connectedServer.filePaths.clear();
+                    connectedServer.fileContents.clear();
+                    connectedServer.virused = true;
+                    connectedServer.filePaths.add("ransom.txt");
+                    connectedServer.fileContents.add("Contents encrypted. To unlock files, transfer $10,000 kreddits to 4566-4447-8897-8513");
+                } else {
+                    returnValue += "{FASTER}Virus already installed on computer.";
                 }
             } else if (text.equalsIgnoreCase("ls")) {
                 if (tutorialLevel < 9) {
@@ -759,6 +771,16 @@ public class GameScreen implements Screen {
                     TextArea textArea = root.findActor("notes-area");
                     textArea.setText(textArea.getText() + "\nBlack Web User: l337h4ck3r\nPassword: changeme");
                 }
+                
+                if (connectedServer.cultist && connectedServer.virused) {
+                    dataPoints += 1;
+                    updateCounterUI();
+                    
+                    if (tutorialLevel < 15) {
+                        Core.instance.playVoice(14);
+                        tutorialLevel = 15;
+                    }
+                }
             }
         } else if (ttyMode == TtyMode.BLACK_WEB) {
             if (text.equalsIgnoreCase("help")) {
@@ -772,9 +794,6 @@ public class GameScreen implements Screen {
                 if (tutorialLevel < 13) {
                     Core.instance.playVoice(13);
                     tutorialLevel = 13;
-        
-                    TextArea textArea = root.findActor("notes-area");
-                    textArea.setText(textArea.getText() + "\nBlack Web User: l337h4ck3r\nPassword: changeme");
                     
                     refreshServers();
                 }
@@ -1146,16 +1165,18 @@ public class GameScreen implements Screen {
         servers.sort();
     }
     
-    private static class Server {
+    private static class Server implements Comparable<Server> {
         private String address;
         private String user;
         private String password;
         private Array<String> filePaths;
         private Array<String> fileContents;
         private boolean cultist;
+        private boolean virused;
         
         public Server(boolean cultist) {
             this.cultist = cultist;
+            virused = false;
             address = MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255);
             user = Core.instance.users.random();
             password = Core.instance.passwords.random();
@@ -1197,6 +1218,11 @@ public class GameScreen implements Screen {
             
             filePaths.add("log.txt");
             fileContents.add("User \"OPERATOR\" (" + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + ") connected at " + TimeUtils.millis());
+        }
+    
+        @Override
+        public int compareTo(Server other) {
+            return this.address.compareTo(other.address);
         }
     }
     
