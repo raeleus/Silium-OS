@@ -527,9 +527,17 @@ public class GameScreen implements Screen {
                     returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
                 }
             } else if (text.equalsIgnoreCase("ssh 192.168.1.255 l337h4ck3r changeme")) {
+                if (tab == tab.TTY1) {
+                    tty1Messages.clear();
+                    createTTY1();
+                }
                 tty1Mode = TtyMode.BLACK_WEB;
                 returnValue += "{FASTER}Successfully logged into the Black Web:\nWe specialize in the untraceable purchase of Kreddit Card numbers.\nWe guarantee complete anonymity.\nType the account number below or \"exit\" to quit";
             } else if (text.startsWith("ssh")) {
+                if (tab == tab.TTY1) {
+                    tty1Messages.clear();
+                    createTTY1();
+                }
                 String[] split = text.split("\\s");
                 if (split.length != 4 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
                     returnValue += "{FASTER}Incorrect paramaters for ssh command. Type \"help\" and press enter to list available commands.";
@@ -729,6 +737,10 @@ public class GameScreen implements Screen {
                     returnValue += "{FASTER}Incorrect paramaters for del command. Type \"help\" and press enter to list available commands.";
                 }
             } else if (text.equalsIgnoreCase("exit")) {
+                if (tab == tab.TTY1) {
+                    tty1Messages.clear();
+                    createTTY1();
+                }
                 returnValue += "Disconnected from server";
                 tty1Path = "";
                 Label label = root.findActor("tty1-path-label");
