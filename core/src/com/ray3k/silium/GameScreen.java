@@ -28,18 +28,15 @@ public class GameScreen implements Screen {
     private Mode mode;
     private boolean transitioning;
     private enum Tab {
-        TTY1, TTY2, NOTES
+        TTY1, NOTES
     }
     private Tab tab;
     private String tty1Path;
     private Array<String> tty1Messages;
-    private String tty2Path;
-    private Array<String> tty2Messages;
     private enum TtyMode {
         DISABLED, NETWORK, SERVER, BRUTE_FORCE, VULNERABILITY, BLACK_WEB, NOC
     }
     private TtyMode tty1Mode;
-    private TtyMode tty2Mode;
     private Table root;
     private ButtonGroup<TextButton> tabButtonGroup;
     private Array<Server> servers;
@@ -52,6 +49,7 @@ public class GameScreen implements Screen {
     private int upgrades;
     private boolean vulnerabilityModule;
     private static Array<String> kredditCards;
+    private Action traceAction;
     
     @Override
     public void show() {
@@ -72,11 +70,6 @@ public class GameScreen implements Screen {
         tty1Messages.add("{FASTER}Type \"help\" and press enter to list available commands.");
         tty1Mode = TtyMode.NETWORK;
         
-        tty2Path = "";
-        tty2Messages = new Array<String>();
-        tty2Messages.add("{FASTER}Type \"help\" and press enter to list available commands.");
-        tty2Mode = TtyMode.DISABLED;
-        
         stage = new Stage(new ScreenViewport());
         Gdx.input.setInputProcessor(stage);
         stage.addListener(new InputListener() {
@@ -86,9 +79,6 @@ public class GameScreen implements Screen {
                     createTTY1();
                     return true;
                 } else if (keycode == Input.Keys.F2) {
-                    createTTY2();
-                    return true;
-                } else if (keycode == Input.Keys.F3) {
                     createNotes();
                     return true;
                 }
@@ -197,18 +187,6 @@ public class GameScreen implements Screen {
                 createTTY1();
             }
         });
-    
-        textButton = new TextButton("TTY2", skin, "tab");
-        textButton.setName("tty2-button");
-        textButton.setProgrammaticChangeEvents(false);
-        table.add(textButton);
-        tabButtonGroup.add(textButton);
-        textButton.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                createTTY2();
-            }
-        });
         
         table.add().expandX();
         
@@ -273,6 +251,9 @@ public class GameScreen implements Screen {
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 TextButton textButton = root.findActor("tty1-button");
                 textButton.setChecked(true);
+    
+                stage.setKeyboardFocus(root.findActor("tty1-field"));
+                stage.setScrollFocus(root.findActor("tty1-message-scroll"));
                 return super.touchDown(event, x, y, pointer, button);
             }
         });
@@ -763,6 +744,7 @@ public class GameScreen implements Screen {
                 label.setText("/" + tty1Path + ">");
                 tty1Mode = TtyMode.NETWORK;
                 refreshServers();
+                stage.getRoot().removeAction(traceAction);
                 
                 if (!connectedServer.filePaths.contains("log.txt",false) && tutorialLevel < 12) {
                     Core.instance.playVoice(12);
@@ -825,11 +807,11 @@ public class GameScreen implements Screen {
     }
     
     private void initiateTrace() {
-        stage.addAction(Actions.delay(200, new Action() {
+        traceAction = Actions.delay(200, new Action() {
             @Override
             public boolean act(float delta) {
                 if (tty1Mode == TtyMode.SERVER || connectedServer.filePaths.contains("log.txt",false)) {
-                    
+            
                     firewalls--;
                     updateCounterUI();
                     if (firewalls < 0) {
@@ -837,38 +819,43 @@ public class GameScreen implements Screen {
                     } else {
                         Core.instance.playVoice(11);
                     }
-                    
+            
                     if (tty1Mode == TtyMode.SERVER) {
+                        if (tab == tab.TTY1) {
+                            tty1Messages.clear();
+                            createTTY1();
+                        }
+                
                         tty1Path = "";
                         Label label = root.findActor("tty1-path-label");
                         label.setText("/" + tty1Path + ">");
                         tty1Mode = TtyMode.NETWORK;
                         tty1Messages.add("Disconnected from server");
-    
+                
                         Table subTable = root.findActor("tty1-message-table");
                         for (Actor actor : subTable.getChildren()) {
                             ((TypingLabel) actor).skipToTheEnd();
                         }
-    
+                
                         subTable.row();
                         TypingLabel typingLabel = new TypingLabel(tty1Messages.get(tty1Messages.size - 1), skin);
                         typingLabel.setWrap(true);
                         subTable.add(typingLabel).growX();
-                        
+                
                         refreshServers();
-    
+                
                         ScrollPane scrollPane = root.findActor("tty1-message-scroll");
                         scrollPane.layout();
                         scrollPane.layout();
                         scrollPane.setScrollPercentY(1);
-    
+                
                         stage.addAction(Actions.delay(12, new Action() {
                             @Override
                             public boolean act(float delta) {
                                 if (tutorialLevel < 12) {
                                     Core.instance.playVoice(12);
                                     tutorialLevel = 12;
-    
+                            
                                     TextArea textArea = root.findActor("notes-area");
                                     textArea.setText(textArea.getText() + "\nBlack Web User: l337h4ck3r\nPassword: changeme");
                                 }
@@ -879,7 +866,8 @@ public class GameScreen implements Screen {
                 }
                 return true;
             }
-        }));
+        });
+        stage.addAction(traceAction);
     }
     
     public void updateCounterUI() {
@@ -1059,34 +1047,6 @@ public class GameScreen implements Screen {
         }
         
         stage.addAction(sequenceAction);
-    }
-    
-    private void createTTY2() {
-        TextButton textButton = root.findActor("tty2-button");
-        textButton.setChecked(true);
-        
-        if (tab != Tab.TTY2) {
-            tab =  Tab.TTY2;
-    
-            Table table = root.findActor("tty-container");
-            table.clear();
-            table.setTouchable(Touchable.enabled);
-            table.addListener(new InputListener() {
-                @Override
-                public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                    TextButton textButton = root.findActor("tty2-button");
-                    textButton.setChecked(true);
-                    return super.touchDown(event, x, y, pointer, button);
-                }
-            });
-    
-            TypingLabel typingLabel = new TypingLabel("{FASTER}TTY2 is not available. Upgrade your systems to add this capability.", skin);
-            typingLabel.setWrap(true);
-            table.add(typingLabel).growX().colspan(2).expandY().top();
-            
-            stage.setKeyboardFocus(null);
-            stage.setScrollFocus(null);
-        }
     }
     
     private void createNotes() {
