@@ -4,6 +4,7 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g3d.particles.values.LineSpawnShapeValue;
 import com.badlogic.gdx.math.MathUtils;
@@ -305,6 +306,8 @@ public class GameScreen implements Screen {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
                 if (keycode == Input.Keys.ENTER) {
+                    Core.instance.playSound("typing");
+                    
                     String command = textField.getText();
                     command = interpretCommand(tty1Mode, command);
                     tty1Messages.add(command);
@@ -633,6 +636,8 @@ public class GameScreen implements Screen {
                 }
             } else if (tutorialLevel >= 13 && text.equalsIgnoreCase("deploy virus.sh")) {
                 if (!connectedServer.virused) {
+                    Core.instance.playSound("win");
+                    
                     returnValue += "{FASTER}......\n.....\n.....\nVirus successfully installed.";
                     connectedServer.filePaths.clear();
                     connectedServer.fileContents.clear();
@@ -792,6 +797,8 @@ public class GameScreen implements Screen {
                 String kredditCard = text.replaceAll("\\D*", "");
                 int index = kredditCards.indexOf(kredditCard, false);
                 if (index != -1) {
+                    Core.instance.playSound("win");
+                    
                     kredditCards.removeIndex(index);
                     returnValue += "{FASTER}Kreddits have been added to your account.";
                     kreddits += 100;
@@ -810,12 +817,14 @@ public class GameScreen implements Screen {
     }
     
     private void initiateTrace() {
+        Core.instance.playSound("alert");
         stage.addAction(Actions.delay(200, new Action() {
             final Server myServer = connectedServer;
             @Override
             public boolean act(float delta) {
                 if (tty1Mode == TtyMode.SERVER && connectedServer == myServer || myServer.filePaths.contains("log.txt",false)) {
-            
+                    Core.instance.playSound("lose");
+                    
                     firewalls--;
                     updateCounterUI();
                     if (firewalls < 0) {

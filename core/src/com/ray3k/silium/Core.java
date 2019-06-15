@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
@@ -42,7 +43,7 @@ public class Core extends Game {
         
         addAssets();
         
-        setScreen(new GameScreen());
+        setScreen(new IntroScreen());
     }
     
     private void addAssets() {
@@ -103,6 +104,13 @@ public class Core extends Game {
             assetManager.load("voice/" + i + "-Mix.mp3", Music.class);
         }
         
+        assetManager.load("sfx/alert.mp3", Sound.class);
+        assetManager.load("sfx/error.mp3", Sound.class);
+        assetManager.load("sfx/incorrect.mp3", Sound.class);
+        assetManager.load("sfx/lose.mp3", Sound.class);
+        assetManager.load("sfx/typing.mp3", Sound.class);
+        assetManager.load("sfx/win.mp3", Sound.class);
+        
         assetManager.finishLoading();
     
         Array<Music> musics = new Array<Music>();
@@ -127,5 +135,11 @@ public class Core extends Game {
         music.play();
         currentVoice = music;
         return music;
+    }
+    
+    public Sound playSound(String name) {
+        Sound sound = assetManager.get("sfx/" + name + ".mp3");
+        sound.play(Core.instance.sfxVolume);
+        return sound;
     }
 }
