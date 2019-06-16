@@ -54,10 +54,10 @@ public class GameScreen implements Screen {
     
     @Override
     public void show() {
-        proxies = 1;
+        proxies = 3;
         kreddits = 0;
         firewalls = 2;
-        dataPoints = 10;
+        dataPoints = 0;
         upgrades = 0;
         
         kredditCards = new Array<String>();
@@ -217,9 +217,11 @@ public class GameScreen implements Screen {
         });
     
         table.row();
-        TextArea textArea = new TextArea("",skin);
+        final TextArea textArea = new TextArea("",skin);
         textArea.setName("notes-area");
         table.add(textArea).grow().padTop(8).minWidth(50);
+        final KeyFilter keyFilter = new KeyFilter();
+        textArea.setTextFieldFilter(keyFilter);
         textArea.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -230,14 +232,25 @@ public class GameScreen implements Screen {
     
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
-                if (keycode == Input.Keys.SPACE && Gdx.app.getType() == Application.ApplicationType.WebGL) {
-                    TextArea textArea = root.findActor("notes-area");
+                if (keycode == Input.Keys.SPACE) {
                     int position = textArea.getCursorPosition();
+                    keyFilter.acceptSpace = true;
                     textArea.setText(textArea.getText().substring(0,position) + " " + textArea.getText().substring(position));
+                    keyFilter.acceptSpace = false;
                     textArea.setCursorPosition(position + 1);
                     return true;
+                } else if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
+                    keyFilter.acceptSpace = true;
                 }
                 return super.keyDown(event, keycode);
+            }
+    
+            @Override
+            public boolean keyUp(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.CONTROL_LEFT || keycode == Input.Keys.CONTROL_RIGHT) {
+                    keyFilter.acceptSpace = false;
+                }
+                return super.keyUp(event, keycode);
             }
         });
         
