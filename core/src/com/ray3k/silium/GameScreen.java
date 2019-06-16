@@ -424,7 +424,7 @@ public class GameScreen implements Screen {
                 if (vulnerabilityModule) returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}\n";
                 if (tutorialLevel >= 15) returnValue += "store {COLOR=#FFFFFFAA}Lists available upgrades for purchase with Kreddits{CLEARCOLOR}\n";
-                if (tutorialLevel >= 15) returnValue += "upgrade {COLOR=#FFFFFFAA}Upgrade Uni Ver to version 2.0{CLEARCOLOR}\n";
+                if (tutorialLevel >= 15) returnValue += "upgrade {COLOR=#FFFFFFAA}Upgrade Uni Ver to version " + (upgrades + 2) + ".0{CLEARCOLOR}\n";
             } else if (text.equalsIgnoreCase("clear")) {
                 if (tab == tab.TTY1) {
                     tty1Messages.clear();
