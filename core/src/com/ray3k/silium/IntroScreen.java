@@ -63,6 +63,7 @@ public class IntroScreen implements Screen {
         stage.addListener(new InputListener() {
             @Override
             public boolean keyDown(InputEvent event, int keycode) {
+                Core.instance.playSound("button");
                 nextScreen();
                 return super.keyDown(event, keycode);
             }

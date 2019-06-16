@@ -100,6 +100,7 @@ public class MenuScreen implements Screen {
         textButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.playSound("button");
                 DialogMission.show(skin, stage);
             }
         });
@@ -109,6 +110,7 @@ public class MenuScreen implements Screen {
         textButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.playSound("button");
                 nextScreen();
             }
         });
@@ -118,6 +120,7 @@ public class MenuScreen implements Screen {
         textButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.playSound("button");
                 Core.instance.playVoice(2);
                 DialogParameters.show(skin,stage);
             }

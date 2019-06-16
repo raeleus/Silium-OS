@@ -104,6 +104,7 @@ public class GameScreen implements Screen {
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.playSound("button");
                 DialogParameters.show(skin, stage);
             }
         });
@@ -113,6 +114,7 @@ public class GameScreen implements Screen {
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.playSound("button");
                 changeScreen(new IntroScreen());
             }
         });
@@ -184,6 +186,7 @@ public class GameScreen implements Screen {
         textButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.playSound("button");
                 createTTY1();
             }
         });
@@ -207,6 +210,7 @@ public class GameScreen implements Screen {
         textButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.playSound("button");
                 createNotes();
             }
         });

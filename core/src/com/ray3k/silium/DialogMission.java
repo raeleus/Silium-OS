@@ -18,6 +18,7 @@ public class DialogMission extends Dialog {
         button.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                Core.instance.playSound("button");
                 hide();
             }
         });

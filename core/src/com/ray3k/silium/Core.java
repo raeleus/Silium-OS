@@ -105,7 +105,7 @@ public class Core extends Game {
         }
         
         assetManager.load("sfx/alert.mp3", Sound.class);
-        assetManager.load("sfx/error.mp3", Sound.class);
+        assetManager.load("sfx/button.mp3", Sound.class);
         assetManager.load("sfx/incorrect.mp3", Sound.class);
         assetManager.load("sfx/lose.mp3", Sound.class);
         assetManager.load("sfx/typing.mp3", Sound.class);
