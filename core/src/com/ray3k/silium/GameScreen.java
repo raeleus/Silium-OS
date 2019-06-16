@@ -476,6 +476,8 @@ public class GameScreen implements Screen {
                 }
                 
                 returnValue += "\n192.168.1.255 (BLACK WEB)";
+            } else if (text.equalsIgnoreCase("brt 192.168.1.255")) {
+                returnValue += "{FASTER}You cannot hack the Black Web. This feature has been disabled for your protection. Type \"help\" and press enter to list available commands.";
             } else if (text.startsWith("brt")) {
                 String[] split = text.split("\\s");
                 if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
