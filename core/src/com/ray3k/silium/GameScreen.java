@@ -34,7 +34,7 @@ public class GameScreen implements Screen {
     private String tty1Path;
     private Array<String> tty1Messages;
     private enum TtyMode {
-        DISABLED, NETWORK, SERVER, BRUTE_FORCE, VULNERABILITY, BLACK_WEB, NOC
+        NETWORK, SERVER, BRUTE_FORCE, BLACK_WEB
     }
     private TtyMode tty1Mode;
     private Table root;
@@ -47,11 +47,9 @@ public class GameScreen implements Screen {
     private int firewalls;
     private int dataPoints;
     private int upgrades;
-    private boolean vulnerabilityModule;
     private static Array<String> kredditCards;
     private static String ipAddress;
     private static float bruteTime = 5;
-    private static float vulTime = 1;
     private static float traceTime = 100;
     
     @Override
@@ -440,7 +438,6 @@ public class GameScreen implements Screen {
                 returnValue += "clear {COLOR=#FFFFFFAA}Clears all text from the TTY{CLEARCOLOR}\n";
                 returnValue += "nmap {COLOR=#FFFFFFAA}Lists all servers connected on the network{CLEARCOLOR}\n";
                 returnValue += "brt <ip address> {COLOR=#FFFFFFAA}Initiate a brute force password hack on the specified IP address{CLEARCOLOR}\n";
-                if (vulnerabilityModule) returnValue += "vul <ip address> {COLOR=#FFFFFFAA}Initiate a vulnerability hack on the specified IP address{CLEARCOLOR}\n";
                 returnValue += "ssh <ip address> <username> <password> {COLOR=#FFFFFFAA}Connect to the system at the specified IP address{CLEARCOLOR}\n";
                 if (tutorialLevel >= 15) returnValue += "store {COLOR=#FFFFFFAA}Lists available upgrades for purchase with Kreddits{CLEARCOLOR}\n";
                 if (tutorialLevel >= 15) returnValue += "upgrade {COLOR=#FFFFFFAA}Upgrade Uni Ver to version " + (upgrades + 2) + ".0{CLEARCOLOR}\n";
@@ -484,33 +481,10 @@ public class GameScreen implements Screen {
                         returnValue += "{FASTER}IP address " + split[1] + " does not exist. Type \"help\" and press enter to list available commands.";
                     }
                 }
-            } else if (vulnerabilityModule && text.startsWith("vul")) {
-                String[] split = text.split("\\s");
-                if (split.length != 2 || !split[1].matches("\\d+\\.\\d+\\.\\d+\\.\\d+")) {
-                    returnValue += "{FASTER}Incorrect paramaters for vul command. Type \"help\" and press enter to list available commands.";
-                } else {
-                    Server matchedServer = null;
-                    for (Server server : servers) {
-                        if (server.address.equalsIgnoreCase(split[1])) {
-                            matchedServer = server;
-                            break;
-                        }
-                    }
-    
-                    if (matchedServer != null) {
-                        if (tab == Tab.TTY1) {
-                            tty1Mode = TtyMode.BRUTE_FORCE;
-                            animateVulnerability(matchedServer);
-                        }
-                    } else {
-                        returnValue += "{FASTER}IP address " + split[1] + " does not exist. Type \"help\" and press enter to list available commands.";
-                    }
-                }
             } else if (tutorialLevel >= 15 && text.equalsIgnoreCase("store")) {
                 returnValue += "{FASTER}Equipment available for purchase:\n";
                 returnValue += "buy proxy {COLOR=#FFFFFFAA}$1,000 A proxy server that increases the time it takes for you to be detected on a system{CLEARCOLOR}\n";
                 returnValue += "buy firewall {COLOR=#FFFFFFAA}$20,000 A firewall system that prevents detection upon system breach{CLEARCOLOR}\n";
-                if(!vulnerabilityModule) returnValue += "buy vul {COLOR=#FFFFFFAA}$50,000 Installs a vulnerability module effective against insecure systems.{CLEARCOLOR}\n";
             } else if (tutorialLevel >= 15 && text.equalsIgnoreCase("buy proxy")) {
                 if (kreddits >= 1000) {
                     returnValue += "{FASTER}Purchase successful.";
@@ -525,15 +499,6 @@ public class GameScreen implements Screen {
                     returnValue += "{FASTER}Purchase successful.";
                     firewalls++;
                     kreddits -= 20000;
-                    updateCounterUI();
-                } else {
-                    returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
-                }
-            } else if (tutorialLevel >= 15 && !vulnerabilityModule && text.equalsIgnoreCase("buy vul")) {
-                if (kreddits >= 50000) {
-                    returnValue += "{FASTER}Purchase successful.";
-                    vulnerabilityModule = true;
-                    kreddits -= 50000;
                     updateCounterUI();
                 } else {
                     returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
@@ -795,11 +760,12 @@ public class GameScreen implements Screen {
                     tty1Messages.clear();
                     createTTY1();
                 }
-                returnValue += "Disconnected from server";
+                returnValue += "Disconnected from server. All proxies have been ditched to maintain plausible deniability.";
                 tty1Path = "";
                 Label label = root.findActor("tty1-path-label");
                 label.setText("/" + tty1Path + ">");
                 tty1Mode = TtyMode.NETWORK;
+                proxies = 0;
                 refreshServers();
                 
                 if (!connectedServer.filePaths.contains("log.txt",false) && tutorialLevel < 12) {
@@ -1010,12 +976,6 @@ public class GameScreen implements Screen {
                 for (Server server : servers) {
                     commands.add("brt " + server.address);
                 }
-                if (vulnerabilityModule) {
-                    commands.add("vul");
-                    for (Server server : servers) {
-                        commands.add("vul " + server.address);
-                    }
-                }
                 commands.add("ssh");
                 for (Server server : servers) {
                     commands.add("ssh " + server.address);
@@ -1026,9 +986,6 @@ public class GameScreen implements Screen {
                     commands.add("buy");
                     commands.add("buy proxy");
                     commands.add("buy firewall");
-                    if (!vulnerabilityModule) {
-                        commands.add("buy vul");
-                    }
                     commands.add("upgrade");
                 }
             } else if (ttyMode == TtyMode.SERVER) {
@@ -1130,63 +1087,6 @@ public class GameScreen implements Screen {
                     typingLabel.setWrap(true);
                     subTable.add(typingLabel).growX();
                 
-                    ScrollPane scrollPane = root.findActor("tty1-message-scroll");
-                    scrollPane.layout();
-                    scrollPane.layout();
-                    scrollPane.setScrollPercentY(1);
-                    tty1Mode = TtyMode.NETWORK;
-    
-                    if (tutorialLevel < 7) {
-                        Core.instance.playVoice(7);
-                        tutorialLevel = 7;
-                    }
-                    return true;
-                }
-            });
-        }
-        
-        stage.addAction(sequenceAction);
-    }
-    
-    private void animateVulnerability(final Server server) {
-        SequenceAction sequenceAction = new SequenceAction();
-        
-        for (int i = 0; i < 200; i++) {
-            if (tab == Tab.TTY1) {
-                sequenceAction.addAction(new Action() {
-                    @Override
-                    public boolean act(float delta) {
-                        String vulnerability = "{FASTER}" + Core.instance.vulnerabilities.random();
-                        tty1Messages.add(vulnerability);
-                        Table subTable = root.findActor("tty1-message-table");
-                        subTable.row();
-                        TypingLabel typingLabel = new TypingLabel(vulnerability, skin);
-                        typingLabel.setWrap(true);
-                        subTable.add(typingLabel).growX();
-                        
-                        ScrollPane scrollPane = root.findActor("tty1-message-scroll");
-                        scrollPane.layout();
-                        scrollPane.layout();
-                        scrollPane.setScrollPercentY(1);
-                        return true;
-                    }
-                });
-                sequenceAction.addAction(Actions.delay(.1f));
-            }
-        }
-        
-        if (tab == Tab.TTY1) {
-            sequenceAction.addAction(new Action() {
-                @Override
-                public boolean act(float delta) {
-                    String message = "{FASTER}\nSuccessfully Hacked " + server.address + "\nUsername is " + server.user + "\nPassword is " + server.password;
-                    tty1Messages.add(message);
-                    Table subTable = root.findActor("tty1-message-table");
-                    subTable.row();
-                    TypingLabel typingLabel = new TypingLabel(message, skin);
-                    typingLabel.setWrap(true);
-                    subTable.add(typingLabel).growX();
-                    
                     ScrollPane scrollPane = root.findActor("tty1-message-scroll");
                     scrollPane.layout();
                     scrollPane.layout();
