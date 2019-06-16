@@ -50,6 +50,7 @@ public class GameScreen implements Screen {
     private int upgrades;
     private boolean vulnerabilityModule;
     private static Array<String> kredditCards;
+    private static String ipAddress;
     
     @Override
     public void show() {
@@ -727,11 +728,17 @@ public class GameScreen implements Screen {
                     int index = connectedServer.filePaths.indexOf(tty1Path + split[1], false);
                     if (index != -1) {
                         returnValue += connectedServer.fileContents.get(index);
+                        
+                        if (!connectedServer.filePaths.get(connectedServer.filePaths.size - 1).equals("log.txt")) {
+                            connectedServer.filePaths.add("log.txt");
+                            connectedServer.fileContents.add("");
+                        }
+                        connectedServer.fileContents.set(connectedServer.fileContents.size - 1, connectedServer.fileContents.get(connectedServer.fileContents.size - 1) + "\nUser \"OPERATOR\" (" + ipAddress + ") read file " + tty1Path + split[1] + " at " + TimeUtils.millis());
                     } else {
                         returnValue += "{FASTER}Could not find file. Type \"help\" and press enter to list available commands.";
                     }
                 } else {
-                    returnValue += "{FASTER}Incorrect paramaters for del command. Type \"help\" and press enter to list available commands.";
+                    returnValue += "{FASTER}Incorrect paramaters for read command. Type \"help\" and press enter to list available commands.";
                 }
             } else if (text.startsWith("del")) {
                 String[] split = text.split("\\s");
@@ -739,6 +746,7 @@ public class GameScreen implements Screen {
                     int index = connectedServer.filePaths.indexOf(tty1Path + split[1], false);
                     if (index != -1) {
                         connectedServer.filePaths.removeIndex(index);
+                        connectedServer.fileContents.removeIndex(index);
                         returnValue += "{FASTER}Deleted file " + split[1];
                     } else {
                         returnValue += "{FASTER}Could not find file. Type \"help\" and press enter to list available commands.";
@@ -847,7 +855,7 @@ public class GameScreen implements Screen {
                         Label label = root.findActor("tty1-path-label");
                         label.setText("/" + tty1Path + ">");
                         tty1Mode = TtyMode.NETWORK;
-                        tty1Messages.add("Disconnected from server");
+                        tty1Messages.add("Disconnected from server. You must delete the log.txt file and exit the server before detection.");
                 
                         Table subTable = root.findActor("tty1-message-table");
                         for (Actor actor : subTable.getChildren()) {
@@ -879,6 +887,18 @@ public class GameScreen implements Screen {
                                 return true;
                             }
                         }));
+                    } else if (tty1Mode == TtyMode.NETWORK) {
+                        tty1Messages.add("You must delete the log.txt file before exiting the server. Logging into servers or reading files creates entries in the log.");
+    
+                        Table subTable = root.findActor("tty1-message-table");
+                        for (Actor actor : subTable.getChildren()) {
+                            ((TypingLabel) actor).skipToTheEnd();
+                        }
+    
+                        subTable.row();
+                        TypingLabel typingLabel = new TypingLabel(tty1Messages.get(tty1Messages.size - 1), skin);
+                        typingLabel.setWrap(true);
+                        subTable.add(typingLabel).growX();
                     }
                 }
                 return true;
@@ -1193,6 +1213,7 @@ public class GameScreen implements Screen {
     }
     
     public void refreshServers() {
+        ipAddress = MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255);
         servers.clear();
         
         for(int i = 0; i < 5; i++) {
@@ -1262,7 +1283,7 @@ public class GameScreen implements Screen {
             }
             
             filePaths.add("log.txt");
-            fileContents.add("User \"OPERATOR\" (" + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + "." + MathUtils.random(255) + ") connected at " + TimeUtils.millis());
+            fileContents.add("User \"OPERATOR\" (" + ipAddress + ") connected at " + TimeUtils.millis());
         }
     
         @Override
