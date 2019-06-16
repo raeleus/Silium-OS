@@ -227,6 +227,18 @@
 	"button-pressed-red": {
 		"name": "button-pressed",
 		"color": "red"
+	},
+	"icon-enemy-red": {
+		"name": "icon-enemy",
+		"color": "red"
+	},
+	"progress-bar-tinted": {
+		"name": "progress-bar",
+		"color": "ui"
+	},
+	"progress-bar-before-red": {
+		"name": "progress-bar-before",
+		"color": "red"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.Button$ButtonStyle": {
@@ -280,6 +292,17 @@
 	},
 	"white": {
 		"font": "font"
+	}
+},
+"com.badlogic.gdx.scenes.scene2d.ui.ProgressBar$ProgressBarStyle": {
+	"default-horizontal": {
+		"background": "progress-bar-tinted",
+		"knob": "icon-enemy-red"
+	},
+	"default-vertical": {
+		"background": "progress-bar-tinted",
+		"knob": "icon-enemy-red",
+		"knobAfter": "progress-bar-before-red"
 	}
 },
 "com.badlogic.gdx.scenes.scene2d.ui.ScrollPane$ScrollPaneStyle": {

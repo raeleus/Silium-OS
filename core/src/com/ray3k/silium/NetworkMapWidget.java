@@ -82,7 +82,7 @@ public class NetworkMapWidget extends Table {
             
             table = new Table();
             stack.add(table);
-            label = new Label(server.address + (server.cultist ? "\nCULTIST" : ""), skin, "ip");
+            label = new Label(server.address + (server.cultist ? "\n(CULTIST)" : ""), skin, "ip");
             label.setAlignment(Align.center);
             table.add(label).bottom().expand();
             

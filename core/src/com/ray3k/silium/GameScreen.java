@@ -50,10 +50,13 @@ public class GameScreen implements Screen {
     private boolean vulnerabilityModule;
     private static Array<String> kredditCards;
     private static String ipAddress;
+    private static float bruteTime = 5;
+    private static float vulTime = 1;
+    private static float traceTime = 100;
     
     @Override
     public void show() {
-        proxies = 3;
+        proxies = 10;
         kreddits = 0;
         firewalls = 2;
         dataPoints = 0;
@@ -822,6 +825,12 @@ public class GameScreen implements Screen {
                 returnValue += "{FASTER}Type the account number below or \"exit\" to quit\n";
             } else if (text.equalsIgnoreCase("exit")) {
                 if (tab == tab.TTY1) {
+                    final Container container = root.findActor("network-map-container");
+                    container.setColor(1,1,1,0);
+                    NetworkMapWidget networkMapWidget = new NetworkMapWidget(servers, skin);
+                    container.setActor(networkMapWidget);
+                    container.addAction(Actions.fadeIn(1f));
+                    
                     tty1Messages.clear();
                     createTTY1();
                 }
@@ -863,13 +872,24 @@ public class GameScreen implements Screen {
     
     private void initiateTrace() {
         Core.instance.playSound("alert");
-        stage.addAction(Actions.delay(200, new Action() {
+        final Container container = root.findActor("network-map-container");
+        final TraceWidget traceWidget = new TraceWidget(proxies, skin);
+        container.setActor(traceWidget);
+        container.setColor(1,1,1,0);
+        container.addAction(Actions.fadeIn(1f));
+        
+        stage.addAction(Actions.parallel(new TemporalAction(traceTime) {
+            @Override
+            protected void update(float percent) {
+                traceWidget.progressBar.setValue(1-percent);
+            }
+        }, Actions.delay(traceTime, new Action() {
             final Server myServer = connectedServer;
             @Override
             public boolean act(float delta) {
                 if (tty1Mode == TtyMode.SERVER && connectedServer == myServer || myServer.filePaths.contains("log.txt",false)) {
                     Core.instance.playSound("lose");
-                    
+            
                     firewalls--;
                     updateCounterUI();
                     if (firewalls < 0) {
@@ -922,12 +942,12 @@ public class GameScreen implements Screen {
                         }));
                     } else if (tty1Mode == TtyMode.NETWORK) {
                         tty1Messages.add("You must delete the log.txt file before exiting the server. Logging into servers or reading files creates entries in the log.");
-    
+                
                         Table subTable = root.findActor("tty1-message-table");
                         for (Actor actor : subTable.getChildren()) {
                             ((TypingLabel) actor).skipToTheEnd();
                         }
-    
+                
                         subTable.row();
                         TypingLabel typingLabel = new TypingLabel(tty1Messages.get(tty1Messages.size - 1), skin);
                         typingLabel.setWrap(true);
@@ -936,7 +956,7 @@ public class GameScreen implements Screen {
                 }
                 return true;
             }
-        }));
+        })));
     }
     
     public void updateCounterUI() {
@@ -1074,7 +1094,7 @@ public class GameScreen implements Screen {
     private void animateBruteForce(final Server server) {
         SequenceAction sequenceAction = new SequenceAction();
         
-        for (int i = 0; i < 200; i++) {
+        for (int i = 0; i < 10 * bruteTime; i++) {
             if (tab == Tab.TTY1) {
                 sequenceAction.addAction(new Action() {
                     @Override

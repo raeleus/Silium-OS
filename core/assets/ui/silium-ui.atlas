@@ -22,35 +22,35 @@ button-menu-close
   index: -1
 button-menu-close-over
   rotate: false
-  xy: 113, 300
+  xy: 113, 182
   size: 43, 29
   orig: 43, 29
   offset: 0, 0
   index: -1
 button-menu-close-pressed
   rotate: false
-  xy: 113, 269
+  xy: 184, 315
   size: 43, 29
   orig: 43, 29
   offset: 0, 0
   index: -1
 button-menu-settings
   rotate: false
-  xy: 113, 238
+  xy: 184, 284
   size: 43, 29
   orig: 43, 29
   offset: 0, 0
   index: -1
 button-menu-settings-over
   rotate: false
-  xy: 113, 207
+  xy: 325, 507
   size: 43, 29
   orig: 43, 29
   offset: 0, 0
   index: -1
 button-menu-settings-pressed
   rotate: false
-  xy: 113, 176
+  xy: 442, 579
   size: 43, 29
   orig: 43, 29
   offset: 0, 0
@@ -75,28 +75,28 @@ button-pressed
   index: -1
 button-window-close
   rotate: false
-  xy: 325, 507
+  xy: 707, 993
   size: 43, 29
   orig: 43, 29
   offset: 0, 0
   index: -1
 button-window-close-over
   rotate: false
-  xy: 442, 579
+  xy: 752, 993
   size: 43, 29
   orig: 43, 29
   offset: 0, 0
   index: -1
 button-window-close-pressed
   rotate: false
-  xy: 707, 993
+  xy: 797, 993
   size: 43, 29
   orig: 43, 29
   offset: 0, 0
   index: -1
 cursor
   rotate: false
-  xy: 367, 541
+  xy: 236, 395
   size: 7, 11
   orig: 7, 11
   offset: 0, 0
@@ -131,21 +131,21 @@ font-ip
   index: -1
 icon-data-points
   rotate: false
-  xy: 158, 288
+  xy: 875, 982
   size: 30, 40
   orig: 30, 40
   offset: 0, 0
   index: -1
 icon-enemy
   rotate: false
-  xy: 113, 331
+  xy: 184, 346
   size: 50, 60
   orig: 50, 60
   offset: 0, 0
   index: -1
 icon-firewall
   rotate: false
-  xy: 165, 330
+  xy: 176, 221
   size: 40, 61
   orig: 40, 61
   offset: 0, 0
@@ -166,7 +166,7 @@ icon-player
   index: -1
 icon-proxy
   rotate: false
-  xy: 158, 246
+  xy: 907, 982
   size: 30, 40
   orig: 30, 40
   offset: 0, 0
@@ -180,14 +180,14 @@ icon-proxy-small
   index: -1
 icon-system
   rotate: false
-  xy: 113, 393
+  xy: 113, 213
   size: 61, 71
   orig: 61, 71
   offset: 0, 0
   index: -1
 label-bg
   rotate: false
-  xy: 752, 991
+  xy: 842, 991
   size: 31, 31
   split: 7, 7, 11, 11
   pad: 10, 10, 11, 11
@@ -196,7 +196,7 @@ label-bg
   index: -1
 line
   rotate: false
-  xy: 487, 598
+  xy: 113, 170
   size: 1, 10
   orig: 1, 10
   offset: 0, 0
@@ -210,9 +210,27 @@ menu-bar
   orig: 121, 40
   offset: 0, 0
   index: -1
+progress-bar
+  rotate: false
+  xy: 113, 286
+  size: 69, 178
+  split: 0, 0, 34, 70
+  pad: 34, 34, 0, 31
+  orig: 69, 178
+  offset: 0, 0
+  index: -1
+progress-bar-before
+  rotate: false
+  xy: 184, 408
+  size: 69, 75
+  split: 0, 0, 34, 0
+  pad: 0, 0, 0, 0
+  orig: 69, 75
+  offset: 0, 0
+  index: -1
 scroll-bar
   rotate: false
-  xy: 266, 498
+  xy: 255, 474
   size: 9, 9
   split: 4, 4, 4, 4
   orig: 9, 9
@@ -297,7 +315,7 @@ toolbar
   index: -1
 white
   rotate: false
-  xy: 367, 538
+  xy: 158, 210
   size: 1, 1
   orig: 1, 1
   offset: 0, 0
