@@ -537,6 +537,15 @@ public class GameScreen implements Screen {
                 }
             } else if (text.equalsIgnoreCase("ssh 192.168.1.255 l337h4ck3r changeme")) {
                 if (tab == tab.TTY1) {
+                    final Container container = root.findActor("network-map-container");
+                    container.addAction(Actions.sequence(Actions.fadeOut(1f), new Action() {
+                        @Override
+                        public boolean act(float delta) {
+                            container.setActor(null);
+                            return true;
+                        }
+                    }));
+                    
                     tty1Messages.clear();
                     createTTY1();
                 }
@@ -558,6 +567,15 @@ public class GameScreen implements Screen {
                     if (matchedServer != null) {
                         if (matchedServer.user.equals(split[2]) && matchedServer.password.equals(split[3])) {
                             if (tab == Tab.TTY1) {
+                                final Container container = root.findActor("network-map-container");
+                                container.addAction(Actions.sequence(Actions.fadeOut(1f), new Action() {
+                                    @Override
+                                    public boolean act(float delta) {
+                                        container.setActor(null);
+                                        return true;
+                                    }
+                                }));
+                                
                                 if (tab == tab.TTY1) {
                                     tty1Messages.clear();
                                     createTTY1();
@@ -1244,11 +1262,12 @@ public class GameScreen implements Screen {
         }
         
         servers.sort();
-    
-        System.out.println("refresh");
-        Container container = root.findActor("network-map-container");
+        
+        final Container container = root.findActor("network-map-container");
+        container.setColor(1,1,1,0);
         NetworkMapWidget networkMapWidget = new NetworkMapWidget(servers, skin);
         container.setActor(networkMapWidget);
+        container.addAction(Actions.fadeIn(1f));
     }
     
     public static class Server implements Comparable<Server> {
