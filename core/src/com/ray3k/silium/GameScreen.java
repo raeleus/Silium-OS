@@ -1,12 +1,9 @@
 package com.ray3k.silium;
 
-import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.g3d.particles.values.LineSpawnShapeValue;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -14,10 +11,12 @@ import com.badlogic.gdx.scenes.scene2d.actions.SequenceAction;
 import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.rafaskoberg.gdx.typinglabel.TypingAdapter;
 import com.rafaskoberg.gdx.typinglabel.TypingLabel;
+
 import java.util.Iterator;
 
 public class GameScreen implements Screen {
@@ -64,7 +63,6 @@ public class GameScreen implements Screen {
         
         tutorialLevel = 0;
         servers = new Array<Server>();
-        refreshServers();
         
         tty1Path = "";
         tty1Messages = new Array<String>();
@@ -125,7 +123,7 @@ public class GameScreen implements Screen {
         root.add(bottom).grow();
         
         table = new Table();
-        bottom.add(table).growY().width(300);
+        bottom.add(table).growY().width(350);
         
         Table subTable = new Table();
         table.add(subTable).growX();
@@ -171,7 +169,10 @@ public class GameScreen implements Screen {
         subTable.add(label).expandX().left();
         
         table.row();
-        table.add().growY();
+        Container container = new Container();
+        container.setName("network-map-container");
+        container.fill();
+        table.add(container).grow().pad(10);
         
         table = new Table();
         table.setBackground(skin.getDrawable("table-with-tab-tinted"));
@@ -254,6 +255,7 @@ public class GameScreen implements Screen {
             }
         });
         
+        refreshServers();
         animationBegin();
     }
     
@@ -1242,16 +1244,21 @@ public class GameScreen implements Screen {
         }
         
         servers.sort();
+    
+        System.out.println("refresh");
+        Container container = root.findActor("network-map-container");
+        NetworkMapWidget networkMapWidget = new NetworkMapWidget(servers, skin);
+        container.setActor(networkMapWidget);
     }
     
-    private static class Server implements Comparable<Server> {
-        private String address;
-        private String user;
-        private String password;
-        private Array<String> filePaths;
-        private Array<String> fileContents;
-        private boolean cultist;
-        private boolean virused;
+    public static class Server implements Comparable<Server> {
+        public String address;
+        public String user;
+        public String password;
+        public Array<String> filePaths;
+        public Array<String> fileContents;
+        public boolean cultist;
+        public boolean virused;
         
         public Server(boolean cultist) {
             this.cultist = cultist;
