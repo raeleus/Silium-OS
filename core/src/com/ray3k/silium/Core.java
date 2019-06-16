@@ -68,22 +68,22 @@ public class Core extends Game {
             userRewardPaths.add(child.name);
             userRewardContents.add(child.asString());
         }
-//
-//        json = jsonReader.parse(Gdx.files.internal("data/cultist-files.json"));
-//        cultistFilePaths = new Array<String>();
-//        cultistFileContents = new Array<String>();
-//        for (JsonValue child : json.iterator()) {
-//            cultistFilePaths.add(child.name);
-//            cultistFileContents.add(child.asString());
-//        }
-//
-//        json = jsonReader.parse(Gdx.files.internal("data/cultist-rewards.json"));
-//        cultistRewardPaths = new Array<String>();
-//        cultistRewardContents = new Array<String>();
-//        for (JsonValue child : json.iterator()) {
-//            cultistRewardPaths.add(child.name);
-//            cultistRewardContents.add(child.asString());
-//        }
+
+        json = jsonReader.parse(Gdx.files.internal("data/cultist-files.json"));
+        cultistFilePaths = new Array<String>();
+        cultistFileContents = new Array<String>();
+        for (JsonValue child : json.iterator()) {
+            cultistFilePaths.add(child.name);
+            cultistFileContents.add(child.asString());
+        }
+
+        json = jsonReader.parse(Gdx.files.internal("data/cultist-rewards.json"));
+        cultistRewardPaths = new Array<String>();
+        cultistRewardContents = new Array<String>();
+        for (JsonValue child : json.iterator()) {
+            cultistRewardPaths.add(child.name);
+            cultistRewardContents.add(child.asString());
+        }
         
         assetManager = new AssetManager(new InternalFileHandleResolver());
         assetManager.load("ui/silium-ui.json", Skin.class);

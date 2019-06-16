@@ -1227,8 +1227,8 @@ public class GameScreen implements Screen {
         }
         
         public void populateFiles() {
-            Array<String> allPaths = new Array<String>(cultist ? Core.instance.userFilePaths : Core.instance.userFilePaths);
-            Array<String> allContents = new Array<String>(cultist ? Core.instance.userFileContents : Core.instance.userFileContents);
+            Array<String> allPaths = new Array<String>(cultist ? Core.instance.cultistFilePaths : Core.instance.userFilePaths);
+            Array<String> allContents = new Array<String>(cultist ? Core.instance.cultistFileContents : Core.instance.userFileContents);
             
             for (int i = 0; i < 5; i++) {
                 int index = MathUtils.random(allPaths.size - 1);
@@ -1238,8 +1238,8 @@ public class GameScreen implements Screen {
                 allContents.removeIndex(index);
             }
     
-            allPaths = new Array<String>(Core.instance.userRewardPaths);
-            allContents = new Array<String>(Core.instance.userRewardContents);
+            allPaths = new Array<String>(cultist ? Core.instance.cultistRewardPaths : Core.instance.userRewardPaths);
+            allContents = new Array<String>(cultist ? Core.instance.cultistRewardContents : Core.instance.userRewardContents);
     
             for (int i = 0; i < 5; i++) {
                 int index = MathUtils.random(allPaths.size - 1);
