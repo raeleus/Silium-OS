@@ -49,12 +49,29 @@ public class GameScreen implements Screen {
     private int upgrades;
     private static Array<String> kredditCards;
     private static String ipAddress;
-    private static float bruteTime = 5;
-    private static float traceTime = 100;
+    private static final float NORMAL_BRUTE_TIME = 20;
+    private static float bruteTime = NORMAL_BRUTE_TIME;
+    private static final float NORMAL_TRACE_TIME = 100;
+    private static float traceTime = NORMAL_TRACE_TIME;
+    private static float progressiveDifficulty = 0;
+    private static final float PROGRESSIVE_DIFFICULTY_INCREASE = 5;
+    private static final float KREDDIT_VALUE = 200;
+    private static final float PROXY_COST = 150;
+    private static final float FIREWALL_COST = 1000;
+    private static final float DATA_POINT_VALUE = 2;
+    
+    private void updateDifficulty() {
+        bruteTime = NORMAL_BRUTE_TIME - upgrades / 8 * NORMAL_BRUTE_TIME + 1;
+        if (bruteTime < 1) bruteTime = 1;
+        traceTime = (proxies + upgrades / 2) / 4 * NORMAL_TRACE_TIME + NORMAL_TRACE_TIME - progressiveDifficulty;
+        if (traceTime < 10) traceTime = 10;
+        
+        System.out.println("b" + bruteTime + " t" + traceTime);
+    }
     
     @Override
     public void show() {
-        proxies = 10;
+        proxies = 3;
         kreddits = 0;
         firewalls = 2;
         dataPoints = 0;
@@ -483,22 +500,23 @@ public class GameScreen implements Screen {
                 }
             } else if (tutorialLevel >= 15 && text.equalsIgnoreCase("store")) {
                 returnValue += "{FASTER}Equipment available for purchase:\n";
-                returnValue += "buy proxy {COLOR=#FFFFFFAA}$1,000 A proxy server that increases the time it takes for you to be detected on a system{CLEARCOLOR}\n";
-                returnValue += "buy firewall {COLOR=#FFFFFFAA}$20,000 A firewall system that prevents detection upon system breach{CLEARCOLOR}\n";
+                returnValue += "buy proxy {COLOR=#FFFFFFAA}$" + PROXY_COST + " A proxy server that increases the time it takes for you to be detected on a system{CLEARCOLOR}\n";
+                returnValue += "buy firewall {COLOR=#FFFFFFAA}$" + FIREWALL_COST + " A firewall system that prevents detection upon system breach{CLEARCOLOR}\n";
             } else if (tutorialLevel >= 15 && text.equalsIgnoreCase("buy proxy")) {
-                if (kreddits >= 1000) {
+                if (kreddits >= PROXY_COST) {
                     returnValue += "{FASTER}Purchase successful.";
                     proxies++;
-                    kreddits -= 1000;
+                    updateDifficulty();
+                    kreddits -= PROXY_COST;
                     updateCounterUI();
                 } else {
                     returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
                 }
             } else if (tutorialLevel >= 15 && text.equalsIgnoreCase("buy firewall")) {
-                if (kreddits >= 20000) {
+                if (kreddits >= FIREWALL_COST) {
                     returnValue += "{FASTER}Purchase successful.";
                     firewalls++;
-                    kreddits -= 20000;
+                    kreddits -= FIREWALL_COST;
                     updateCounterUI();
                 } else {
                     returnValue += "{FASTER}Not enough Kreddits. Sell account number on the Black Web to turn a profit.";
@@ -583,6 +601,7 @@ public class GameScreen implements Screen {
                 if (dataPoints > 0) {
                     dataPoints--;
                     upgrades++;
+                    updateDifficulty();
                     updateCounterUI();
                     
                     switch (upgrades) {
@@ -766,6 +785,9 @@ public class GameScreen implements Screen {
                 label.setText("/" + tty1Path + ">");
                 tty1Mode = TtyMode.NETWORK;
                 proxies = 0;
+                progressiveDifficulty += PROGRESSIVE_DIFFICULTY_INCREASE;
+                updateDifficulty();
+                updateCounterUI();
                 refreshServers();
                 
                 if (!connectedServer.filePaths.contains("log.txt",false) && tutorialLevel < 12) {
@@ -773,11 +795,14 @@ public class GameScreen implements Screen {
                     tutorialLevel = 12;
                     
                     TextArea textArea = root.findActor("notes-area");
+                    KeyFilter keyFilter = (KeyFilter) textArea.getTextFieldFilter();
+                    keyFilter.acceptSpace = true;
                     textArea.setText(textArea.getText() + "\nBlack Web User: l337h4ck3r\nPassword: changeme");
+                    keyFilter.acceptSpace = false;
                 }
                 
                 if (connectedServer.cultist && connectedServer.virused) {
-                    dataPoints += 1;
+                    dataPoints += DATA_POINT_VALUE;
                     updateCounterUI();
                     
                     if (tutorialLevel < 15) {
@@ -821,7 +846,7 @@ public class GameScreen implements Screen {
                     
                     kredditCards.removeIndex(index);
                     returnValue += "{FASTER}Kreddits have been added to your account.";
-                    kreddits += 100;
+                    kreddits += KREDDIT_VALUE;
                     updateCounterUI();
                 } else {
                     returnValue += "{FASTER}That card doesn't work. Try again.";
@@ -875,6 +900,8 @@ public class GameScreen implements Screen {
                         label.setText("/" + tty1Path + ">");
                         tty1Mode = TtyMode.NETWORK;
                         tty1Messages.add("Disconnected from server. You must delete the log.txt file and exit the server before detection.");
+                        proxies = 0;
+                        updateCounterUI();
                 
                         Table subTable = root.findActor("tty1-message-table");
                         for (Actor actor : subTable.getChildren()) {
@@ -901,7 +928,10 @@ public class GameScreen implements Screen {
                                     tutorialLevel = 12;
                             
                                     TextArea textArea = root.findActor("notes-area");
+                                    KeyFilter keyFilter = (KeyFilter) textArea.getTextFieldFilter();
+                                    keyFilter.acceptSpace = true;
                                     textArea.setText(textArea.getText() + "\nBlack Web User: l337h4ck3r\nPassword: changeme");
+                                    keyFilter.acceptSpace = false;
                                 }
                                 return true;
                             }
