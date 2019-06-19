@@ -61,9 +61,9 @@ public class GameScreen implements Screen {
     private static final float DATA_POINT_VALUE = 2;
     
     private void updateDifficulty() {
-        bruteTime = NORMAL_BRUTE_TIME - upgrades / 8 * NORMAL_BRUTE_TIME + 1;
+        bruteTime = NORMAL_BRUTE_TIME - upgrades / 8f * NORMAL_BRUTE_TIME + 1;
         if (bruteTime < 1) bruteTime = 1;
-        traceTime = (proxies + upgrades / 2) / 4 * NORMAL_TRACE_TIME + NORMAL_TRACE_TIME - progressiveDifficulty;
+        traceTime = (proxies + upgrades / 2f) / 4 * NORMAL_TRACE_TIME + NORMAL_TRACE_TIME - progressiveDifficulty;
         if (traceTime < 10) traceTime = 10;
         
         System.out.println("b" + bruteTime + " t" + traceTime);
@@ -445,7 +445,7 @@ public class GameScreen implements Screen {
     }
     
     private String interpretCommand(TtyMode ttyMode,  String text) {
-        String returnValue = text + "\n";
+        String returnValue = "{FASTER}" + text + "\n";
         
         if (ttyMode == TtyMode.NETWORK) {
             if (text.equalsIgnoreCase("help")) {
@@ -749,7 +749,7 @@ public class GameScreen implements Screen {
                 if (split.length == 2) {
                     int index = connectedServer.filePaths.indexOf(tty1Path + split[1], false);
                     if (index != -1) {
-                        returnValue += connectedServer.fileContents.get(index);
+                        returnValue += "{SPEED=8}" + connectedServer.fileContents.get(index);
                         
                         if (!connectedServer.filePaths.get(connectedServer.filePaths.size - 1).equals("log.txt")) {
                             connectedServer.filePaths.add("log.txt");
